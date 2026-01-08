@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { booksApi, type BooksParams } from '@/services/api';
-import type { Book } from '@/services/mockData';
+import type { Book } from '@/types';
 import type { BookFormData } from '../schemas/bookSchema';
 import { toast } from 'sonner';
 

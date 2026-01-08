@@ -1,6 +1,6 @@
 import React from 'react';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import type { Member } from '@/services/mockData';
+import type { Member } from '@/types';
 import { LoadingSpinner, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui';
 
 interface MembersTableProps {

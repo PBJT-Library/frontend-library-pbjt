@@ -6,7 +6,7 @@ import { LoanFormModal } from './LoanFormModal';
 import { EditLoanModal } from './EditLoanModal';
 import { useLoans, useReturnBook } from '../hooks/useLoans';
 import { Button, Card } from '@/components/ui';
-import type { Loan } from '@/services/mockData';
+import type { Loan } from '@/types';
 
 export const LoansPage: React.FC = () => {
     const [page, setPage] = useState(1);

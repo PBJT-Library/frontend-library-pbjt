@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { memberSchema, type MemberFormData } from '../schemas/memberSchema';
 import { useCreateMember, useUpdateMember } from '../hooks/useMembers';
 import { Input, Modal, ModalFooter, Button } from '@/components/ui';
-import type { Member } from '@/services/mockData';
+import type { Member } from '@/types';
 
 interface MemberFormModalProps {
     isOpen: boolean;

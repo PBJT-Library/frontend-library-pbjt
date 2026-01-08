@@ -5,7 +5,7 @@ import { MemberFormModal } from './MemberFormModal';
 import { DeleteMemberDialog } from './DeleteMemberDialog';
 import { useMembers, useDeleteMember } from '../hooks/useMembers';
 import { Button, Card, Input, Select } from '@/components/ui';
-import type { Member } from '@/services/mockData';
+import type { Member } from '@/types';
 
 export const MembersPage: React.FC = () => {
     const [page, setPage] = useState(1);

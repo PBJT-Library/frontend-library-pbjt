@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { membersApi, type MembersParams } from '@/services/api';
-import type { Member } from '@/services/mockData';
+import type { Member } from '@/types';
 import type { MemberFormData } from '../schemas/memberSchema';
 import { toast } from 'sonner';
 

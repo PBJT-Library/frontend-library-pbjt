@@ -1,6 +1,6 @@
 import React from 'react';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import type { Book } from '@/services/mockData';
+import type { Book } from '@/types';
 import { StockBadge } from './StockBadge';
 import { LoadingSpinner, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui';
 

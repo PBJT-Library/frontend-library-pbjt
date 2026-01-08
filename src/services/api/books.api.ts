@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { type Book } from '../mockData';
+import { type Book } from '../../types';
 import { paginate, type PaginationParams, type PaginatedResponse } from '../utils/pagination';
 import { sortData } from '../utils/filter';
 

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { bookSchema, type BookFormData } from '../schemas/bookSchema';
 import { useCreateBook, useUpdateBook } from '../hooks/useBooks';
 import { Input, Select, Modal, ModalFooter, Button } from '@/components/ui';
-import type { Book } from '@/services/mockData';
+import type { Book } from '@/types';
 import { ACADEMIC_CATEGORIES, REGULAR_CATEGORIES } from '@/services/constants/categories';
 
 interface BookFormModalProps {

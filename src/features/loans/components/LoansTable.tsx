@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowUturnLeftIcon, PencilIcon } from '@heroicons/react/24/outline';
-import type { Loan } from '@/services/mockData';
+import type { Loan } from '@/types';
 import { LoadingSpinner, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button } from '@/components/ui';
 
 interface LoansTableProps {

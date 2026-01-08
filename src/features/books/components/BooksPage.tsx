@@ -5,7 +5,7 @@ import { BookFormModal } from './BookFormModal';
 import { DeleteBookDialog } from './DeleteBookDialog';
 import { useBooks, useDeleteBook } from '../hooks/useBooks';
 import { Button, Card, Input, Select } from '@/components/ui';
-import type { Book } from '@/services/mockData';
+import type { Book } from '@/types';
 import { ACADEMIC_CATEGORIES, REGULAR_CATEGORIES } from '@/services/constants/categories';
 
 export const BooksPage: React.FC = () => {

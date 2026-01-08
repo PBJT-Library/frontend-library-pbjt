@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Button, Input } from '@/components/ui';
-import type { Loan } from '@/services/mockData';
+import type { Loan } from '@/types';
 
 const editLoanSchema = z.object({
     dueDate: z.string().min(1, 'Due date is required'),
