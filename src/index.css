@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+  }
+
+  /* Prevent browser autocomplete from overriding dark theme */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px rgb(51 65 85 / 0.5) inset !important;
+    -webkit-text-fill-color: rgb(226 232 240) !important;
+    border: 2px solid rgb(100 116 139) !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Dark mode autocomplete - force same color as Input component */
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus,
+  .dark input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px rgb(51 65 85 / 0.5) inset !important;
+    -webkit-text-fill-color: rgb(226 232 240) !important;
+    border: 2px solid rgb(100 116 139) !important;
+  }
+}
