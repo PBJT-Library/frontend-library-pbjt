@@ -52,10 +52,9 @@ export const LoansPage: React.FC = () => {
         setIsEditOpen(true);
     };
 
-    const handleSaveEdit = async (loanId: string, data: { dueDate: string; quantity: number }) => {
+    const handleSaveEdit = async (_loanId: string, _data: { loan_date: string; quantity: number }) => {
         try {
             // TODO: Implement API call to update loan
-            console.log('Updating loan:', loanId, data);
             toast.success('Loan updated successfully');
             // Refetch data here
         } catch (error) {

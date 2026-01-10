@@ -7,7 +7,7 @@ import { Button, Input } from '@/components/ui';
 import type { Loan } from '@/types';
 
 const editLoanSchema = z.object({
-    dueDate: z.string().min(1, 'Due date is required'),
+    loan_date: z.string().min(1, 'Loan date is required'),
     quantity: z.number().min(1, 'Quantity must be at least 1'),
 });
 
@@ -34,16 +34,16 @@ export const EditLoanModal: React.FC<EditLoanModalProps> = ({
     } = useForm<EditLoanFormData>({
         resolver: zodResolver(editLoanSchema),
         defaultValues: {
-            dueDate: loan?.due_date || '',
-            quantity: 1,
+            loan_date: loan?.loan_date || '',
+            quantity: loan?.quantity || 1,
         },
     });
 
     React.useEffect(() => {
         if (loan) {
             reset({
-                dueDate: loan.due_date,
-                quantity: 1, // Default quantity
+                loan_date: loan.loan_date,
+                quantity: loan.quantity,
             });
         }
     }, [loan, reset]);
@@ -104,10 +104,10 @@ export const EditLoanModal: React.FC<EditLoanModalProps> = ({
 
                     {/* Editable Fields */}
                     <Input
-                        label="Due Date"
+                        label="Loan Date"
                         type="date"
-                        {...register('dueDate')}
-                        error={errors.dueDate?.message}
+                        {...register('loan_date')}
+                        error={errors.loan_date?.message}
                         disabled={isSubmitting}
                     />
 
@@ -124,13 +124,11 @@ export const EditLoanModal: React.FC<EditLoanModalProps> = ({
                     {/* Status Badge */}
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-slate-600 dark:text-slate-300">Status:</span>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${loan.returned
-                            ? 'bg-success-light text-success-dark'
-                            : new Date(loan.due_date) < new Date()
-                                ? 'bg-error-light text-error-dark'
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${loan.return_date
+                                ? 'bg-success-light text-success-dark'
                                 : 'bg-warning-light text-warning-dark'
                             }`}>
-                            {loan.returned ? 'Returned' : new Date(loan.due_date) < new Date() ? 'Overdue' : 'Active'}
+                            {loan.return_date ? 'Returned' : 'Active'}
                         </span>
                     </div>
 

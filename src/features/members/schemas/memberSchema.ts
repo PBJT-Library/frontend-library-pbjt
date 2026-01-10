@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 export const memberSchema = z.object({
-    nim: z.string()
-        .min(8, 'NIM minimal 8 karakter')
-        .max(15, 'NIM maksimal 15 karakter')
-        .regex(/^[0-9]+$/, 'NIM harus berupa angka'),
+    id: z.string()
+        .min(8, 'ID minimal 8 karakter')
+        .max(15, 'ID maksimal 15 karakter')
+        .regex(/^[0-9]+$/, 'ID harus berupa angka'),
     name: z.string()
         .min(3, 'Nama minimal 3 karakter')
         .max(100, 'Nama maksimal 100 karakter'),

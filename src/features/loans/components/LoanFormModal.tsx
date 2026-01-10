@@ -84,7 +84,7 @@ export const LoanFormModal: React.FC<LoanFormModalProps> = ({
                         <option value="">Select member</option>
                         {members.map(member => (
                             <option key={member.id} value={member.id}>
-                                {member.uuid} - {member.name} ({member.study_program})
+                                {member.id} - {member.name} ({member.study_program})
                             </option>
                         ))}
                     </Select>
@@ -97,7 +97,7 @@ export const LoanFormModal: React.FC<LoanFormModalProps> = ({
                         <option value="">Select book</option>
                         {books.map(book => (
                             <option key={book.id} value={book.id} disabled={book.stock === 0}>
-                                {book.uuid} - {book.title} (Stock: {book.stock})
+                                {book.id} - {book.title} (Stock: {book.stock})
                             </option>
                         ))}
                     </Select>

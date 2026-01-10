@@ -104,7 +104,7 @@ export const Sidebar: React.FC = () => {
                             {user?.name || 'User'}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-300 capitalize">
-                            {user?.role || 'member'}
+                            {user?.role || 'admin'}
                         </p>
                     </div>
                 </div>

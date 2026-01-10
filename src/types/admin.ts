@@ -9,11 +9,6 @@ export interface LoginRequest {
     password: string;
 }
 
-export interface RegisterRequest {
-    username: string;
-    password: string;
-}
-
 export interface LoginResponse {
     token: string;
     admin: Admin;

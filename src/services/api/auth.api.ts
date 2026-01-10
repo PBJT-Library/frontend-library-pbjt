@@ -1,44 +1,32 @@
 import apiClient from './client';
-import type { Admin, LoginRequest, RegisterRequest, LoginResponse, AuthResponse } from '../../types';
+import type { Admin, LoginRequest, LoginResponse, AuthResponse } from '../../types';
 
 export const authApi = {
     /**
      * POST /admin/login - Admin login
      */
     login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-        try {
-            const response = await apiClient.post<LoginResponse>('/admin/login', credentials);
+        const response = await apiClient.post<LoginResponse>('/admin/login', credentials);
 
-            // Store token in localStorage
-            if (response.data.token) {
-                localStorage.setItem('auth_token', response.data.token);
-            }
-
-            return response.data;
-        } catch (error) {
-            console.error('Login error:', error);
-            throw new Error('Invalid username or password');
+        // Store token in localStorage
+        if (response.data.token) {
+            localStorage.setItem('auth_token', response.data.token);
         }
+
+        return response.data;
     },
 
     /**
-     * POST /admin/register - Register new admin
+     * POST /admin/register - Admin registration
      */
-    register: async (data: RegisterRequest): Promise<LoginResponse> => {
-        try {
-            const response = await apiClient.post<LoginResponse>('/admin/register', data);
-
-            // Store token in localStorage
-            if (response.data.token) {
-                localStorage.setItem('auth_token', response.data.token);
-            }
-
-            return response.data;
-        } catch (error) {
-            console.error('Registration error:', error);
-            throw new Error('Registration failed');
-        }
+    register: async (credentials: LoginRequest): Promise<{ message: string; admin: Admin }> => {
+        const response = await apiClient.post<{ message: string; admin: Admin }>('/admin/register', credentials);
+        // Backend returns { message, admin } without token
+        // User needs to login after registration
+        return response.data;
     },
+
+
 
     /**
      * GET /admin/me - Get current admin info
@@ -56,7 +44,7 @@ export const authApi = {
     /**
      * PUT /admin/me - Update admin credentials
      */
-    updateMe: async (data: Partial<RegisterRequest>): Promise<Admin> => {
+    updateMe: async (data: Partial<LoginRequest>): Promise<Admin> => {
         try {
             const response = await apiClient.put<AuthResponse>('/admin/me', data);
             return response.data.admin;

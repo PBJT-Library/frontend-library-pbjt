@@ -53,7 +53,7 @@ export const BooksTable: React.FC<BooksTableProps> = ({
                 {books.map((book) => (
                     <TableRow key={book.id}>
                         <TableCell>
-                            <div className="font-mono text-xs text-slate-600 dark:text-slate-400">{book.uuid}</div>
+                            <div className="font-mono text-xs text-slate-600 dark:text-slate-400">{book.id}</div>
                         </TableCell>
                         <TableCell>
                             <div className="font-medium text-slate-900 dark:text-slate-50">{book.title}</div>

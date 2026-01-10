@@ -34,38 +34,39 @@ apiClient.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
-        // Handle common errors
-        if (error.response) {
-            // Server responded with error status
-            const status = error.response.status;
+        // Extract error data from backend response
+        const errorData = error.response?.data as any;
+        const status = error.response?.status;
 
-            switch (status) {
-                case 401:
-                    // Unauthorized - clear token and redirect to login
-                    localStorage.removeItem('auth_token');
-                    window.location.href = '/login';
-                    break;
-                case 403:
-                    console.error('Forbidden: You do not have permission');
-                    break;
-                case 404:
-                    console.error('Resource not found');
-                    break;
-                case 500:
-                    console.error('Server error');
-                    break;
-                default:
-                    console.error(`Error ${status}:`, error.response.data);
-            }
-        } else if (error.request) {
-            // Request made but no response
-            console.error('Network error: No response from server');
-        } else {
-            // Error in request setup
-            console.error('Request error:', error.message);
+        // Determine error message
+        let message = 'An unexpected error occurred';
+
+        if (errorData?.message) {
+            // Backend provided a message
+            message = errorData.message;
+        } else if (status === 400) {
+            message = 'Invalid request data';
+        } else if (status === 404) {
+            message = 'Resource not found';
+        } else if (status === 500) {
+            message = 'Server error occurred';
+        } else if (!error.response) {
+            message = 'Network error - please check your connection';
         }
 
-        return Promise.reject(error);
+        // Handle authentication errors
+        if (status === 401) {
+            localStorage.removeItem('auth_token');
+            window.location.href = '/login';
+            message = 'Session expired - please login again';
+        }
+
+        // Create enhanced error with extracted message
+        const enhancedError = new Error(message);
+        (enhancedError as any).status = status;
+        (enhancedError as any).data = errorData;
+
+        return Promise.reject(enhancedError);
     }
 );
 

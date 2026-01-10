@@ -44,12 +44,13 @@ VITE_APP_NAME=PBJT Library Management System
 
 ## ✨ Features
 
-- 🔐 **Authentication** - JWT-based admin login
-- 📚 **Books Management** - Full CRUD with search & filtering
-- 👥 **Members Management** - Student registration & tracking
-- 📖 **Loans Management** - Borrow/return with stock validation
-- 🌙 **Dark Mode** - System-wide theme support
+- 🔐 **Admin Authentication** - JWT-based login (admin-only access)
+- 📚 **Books Management** - Full CRUD with search, filtering & stock tracking
+- 👥 **Members Management** - Student registration & profile management
+- 📖 **Loans Management** - Borrow/return with stock validation & due dates
+- 🌙 **Dark Mode** - System-wide theme support with persistence
 - 🖥️ **Desktop App** - Cross-platform (Windows, macOS, Linux)
+- ⚙️ **Settings** - Profile, preferences, and security management
 
 ---
 
@@ -58,10 +59,12 @@ VITE_APP_NAME=PBJT Library Management System
 | Category | Technology |
 |----------|-----------|
 | **Framework** | React 19, TypeScript, Vite |
-| **Styling** | Tailwind CSS, Headless UI |
+| **Styling** | Tailwind CSS |
 | **State** | Zustand, TanStack Query |
 | **Forms** | React Hook Form, Zod |
 | **Desktop** | Tauri 2.9 (Rust) |
+| **Icons** | Heroicons |
+| **Notifications** | Sonner |
 
 ---
 
@@ -73,104 +76,108 @@ frontend-perpus/
 │   └── workflows/
 │       └── release.yml         # GitHub Actions for automated releases
 │
-├── public/                     # Static assets
-│   └── vite.svg
+├── public/                     # Static assets (empty after cleanup)
 │
 ├── src/
-│   ├── app/
-│   │   └── router.tsx         # React Router configuration
+│   ├── app/                    # Application configuration
+│   │   └── providers/
+│   │       └── QueryProvider.tsx  # TanStack Query setup
 │   │
-│   ├── assets/                # Images, fonts, etc.
-│   │   └── react.svg
-│   │
-│   ├── components/            # Reusable UI components
-│   │   ├── BrandPanel.tsx    # Auth page branding
-│   │   ├── Button.tsx        # Button component
-│   │   ├── Card.tsx          # Card container
-│   │   ├── Checkbox.tsx      # Checkbox input
-│   │   ├── Input.tsx         # Text input
-│   │   ├── Label.tsx         # Form label
-│   │   ├── Modal.tsx         # Modal dialog
-│   │   ├── Pagination.tsx    # Pagination controls
-│   │   ├── SearchBar.tsx     # Search input
-│   │   ├── Select.tsx        # Dropdown select
-│   │   ├── Sidebar.tsx       # Navigation sidebar
-│   │   ├── Table.tsx         # Data table
-│   │   ├── Tabs.tsx          # Tab navigation
-│   │   └── Textarea.tsx      # Multiline text input
+│   ├── components/             # Reusable UI components
+│   │   ├── layout/            # Layout components
+│   │   │   ├── AppShell.tsx   # Main app layout wrapper
+│   │   │   ├── Breadcrumbs.tsx # Navigation breadcrumbs
+│   │   │   ├── Header.tsx     # Top navigation bar
+│   │   │   ├── Sidebar.tsx    # Side navigation menu
+│   │   │   └── index.ts       # Layout exports
+│   │   │
+│   │   └── ui/                # UI primitives
+│   │       ├── Badge.tsx      # Status badges
+│   │       ├── Button.tsx     # Button component
+│   │       ├── Card.tsx       # Card container
+│   │       ├── Input.tsx      # Text input
+│   │       ├── LoadingSpinner.tsx # Loading indicator
+│   │       ├── Modal.tsx      # Modal dialog
+│   │       ├── Select.tsx     # Dropdown select
+│   │       ├── Table.tsx      # Data table
+│   │       └── index.ts       # UI exports
 │   │
 │   ├── features/              # Feature modules (domain-driven)
 │   │   ├── auth/             # Authentication
 │   │   │   ├── components/
-│   │   │   │   ├── LoginPage.tsx
-│   │   │   │   └── RegisterPage.tsx
-│   │   │   ├── hooks/
-│   │   │   │   └── useAuth.ts
-│   │   │   └── schemas/
-│   │   │       └── authSchema.ts
+│   │   │   │   ├── BrandPanel.tsx    # Auth page branding
+│   │   │   │   └── LoginPage.tsx     # Login form
+│   │   │   ├── schemas/
+│   │   │   │   └── loginSchema.ts    # Login validation
+│   │   │   └── store/
+│   │   │       └── authStore.ts      # Auth state (Zustand)
 │   │   │
 │   │   ├── books/            # Books management
 │   │   │   ├── components/
-│   │   │   │   ├── BookFormModal.tsx
-│   │   │   │   ├── BooksPage.tsx
-│   │   │   │   └── BooksTable.tsx
+│   │   │   │   ├── BookFormModal.tsx    # Add/Edit book
+│   │   │   │   ├── BooksPage.tsx        # Books list page
+│   │   │   │   ├── BooksTable.tsx       # Books data table
+│   │   │   │   ├── DeleteBookDialog.tsx # Delete confirmation
+│   │   │   │   └── StockBadge.tsx       # Stock status badge
 │   │   │   ├── hooks/
-│   │   │   │   └── useBooks.ts
+│   │   │   │   └── useBooks.ts          # Books data hooks
 │   │   │   └── schemas/
-│   │   │       └── bookSchema.ts
+│   │   │       └── bookSchema.ts        # Book validation
 │   │   │
 │   │   ├── dashboard/        # Dashboard
 │   │   │   └── components/
-│   │   │       └── DashboardPage.tsx
+│   │   │       └── Dashboard.tsx        # Main dashboard
 │   │   │
 │   │   ├── loans/            # Loans management
 │   │   │   ├── components/
-│   │   │   │   ├── EditLoanModal.tsx
-│   │   │   │   ├── LoansPage.tsx
-│   │   │   │   └── LoansTable.tsx
+│   │   │   │   ├── EditLoanModal.tsx    # Edit loan details
+│   │   │   │   ├── LoanFormModal.tsx    # Create new loan
+│   │   │   │   ├── LoansPage.tsx        # Loans list page
+│   │   │   │   └── LoansTable.tsx       # Loans data table
 │   │   │   ├── hooks/
-│   │   │   │   └── useLoans.ts
+│   │   │   │   └── useLoans.ts          # Loans data hooks
 │   │   │   └── schemas/
-│   │   │       └── loanSchema.ts
+│   │   │       └── loanSchema.ts        # Loan validation
 │   │   │
 │   │   ├── members/          # Members management
 │   │   │   ├── components/
-│   │   │   │   ├── MemberFormModal.tsx
-│   │   │   │   ├── MembersPage.tsx
-│   │   │   │   └── MembersTable.tsx
+│   │   │   │   ├── DeleteMemberDialog.tsx # Delete confirmation
+│   │   │   │   ├── MemberFormModal.tsx    # Add/Edit member
+│   │   │   │   ├── MembersPage.tsx        # Members list page
+│   │   │   │   └── MembersTable.tsx       # Members data table
 │   │   │   ├── hooks/
-│   │   │   │   └── useMembers.ts
+│   │   │   │   └── useMembers.ts          # Members data hooks
 │   │   │   └── schemas/
-│   │   │       └── memberSchema.ts
+│   │   │       └── memberSchema.ts        # Member validation
 │   │   │
 │   │   └── settings/         # User settings
 │   │       ├── components/
-│   │       │   └── SettingsPage.tsx
-│   │       ├── hooks/
-│   │       │   └── useSettings.ts
+│   │       │   ├── PreferencesTab.tsx   # App preferences
+│   │       │   ├── ProfileTab.tsx       # User profile
+│   │       │   ├── SecurityTab.tsx      # Password change
+│   │       │   └── SettingsPage.tsx     # Settings container
 │   │       └── schemas/
-│   │           └── settingsSchema.ts
-│   │
-│   ├── hooks/                # Global custom hooks
-│   │
-│   ├── schemas/              # Global Zod schemas
+│   │           ├── passwordSchema.ts    # Password validation
+│   │           └── profileSchema.ts     # Profile validation
 │   │
 │   ├── services/             # External services
 │   │   ├── api/             # API client & endpoints
 │   │   │   ├── auth.api.ts  # Authentication API
-│   │   │   ├── books.api.ts # Books API
-│   │   │   ├── client.ts    # Axios instance
+│   │   │   ├── books.api.ts # Books CRUD API
+│   │   │   ├── client.ts    # Axios instance with interceptors
 │   │   │   ├── index.ts     # API exports
-│   │   │   ├── loans.api.ts # Loans API
-│   │   │   └── members.api.ts # Members API
+│   │   │   ├── loans.api.ts # Loans CRUD API
+│   │   │   └── members.api.ts # Members CRUD API
 │   │   ├── constants/       # App constants
-│   │   │   └── index.ts
-│   │   └── utils/           # Utility functions
-│   │       └── delay.ts
+│   │   │   └── categories.ts # Book categories
+│   │   └── utils/           # Service utilities
+│   │       ├── delay.ts     # Async delay helper
+│   │       ├── filter.ts    # Data filtering
+│   │       └── pagination.ts # Pagination helper
 │   │
 │   ├── stores/              # Zustand state management
-│   │   ├── useSettingsStore.ts
-│   │   └── useThemeStore.ts
+│   │   ├── themeStore.ts    # Dark mode state
+│   │   └── uiStore.ts       # UI state (sidebar, etc)
 │   │
 │   ├── types/               # TypeScript type definitions
 │   │   ├── admin.ts        # Admin & auth types
@@ -180,16 +187,14 @@ frontend-perpus/
 │   │   └── member.ts       # Member entity
 │   │
 │   ├── utils/               # Global utilities
-│   │   └── cn.ts           # className utility
+│   │   └── cn.ts           # className merge utility
 │   │
-│   ├── App.css             # App-level styles
-│   ├── App.tsx             # Root component
+│   ├── App.tsx             # Root component with routing
 │   ├── index.css           # Global styles & Tailwind
 │   └── main.tsx            # Entry point
 │
 ├── src-tauri/               # Tauri desktop app (Rust)
-│   ├── icons/              # App icons
-│   │   └── README.md
+│   ├── icons/              # App icons for all platforms
 │   ├── src/
 │   │   └── main.rs         # Rust entry point
 │   ├── build.rs            # Build script
@@ -202,7 +207,7 @@ frontend-perpus/
 ├── eslint.config.js        # ESLint configuration
 ├── index.html              # HTML entry point
 ├── package.json            # Node dependencies & scripts
-├── postcss.config.js       # PostCSS configuration
+├── postcss.config.cjs      # PostCSS configuration
 ├── README.md               # This file
 ├── tailwind.config.js      # Tailwind CSS configuration
 ├── tsconfig.app.json       # TypeScript config (app)
@@ -210,6 +215,53 @@ frontend-perpus/
 ├── tsconfig.node.json      # TypeScript config (node)
 └── vite.config.ts          # Vite configuration
 ```
+
+### 📂 Structure Explanation
+
+#### **`src/app/`** - Application Core
+- **`providers/`**: React context providers (TanStack Query setup)
+
+#### **`src/components/`** - Reusable Components
+- **`layout/`**: Page layout components (AppShell, Header, Sidebar, Breadcrumbs)
+- **`ui/`**: Primitive UI components (Button, Input, Modal, Table, etc.)
+
+#### **`src/features/`** - Feature Modules (Domain-Driven Design)
+Each feature is self-contained with:
+- **`components/`**: Feature-specific UI components
+- **`hooks/`**: Custom React hooks for data fetching (TanStack Query)
+- **`schemas/`**: Zod validation schemas
+- **`store/`**: Zustand state management (auth only)
+
+**Features**:
+- **`auth/`**: Login, authentication state
+- **`books/`**: Book CRUD operations
+- **`dashboard/`**: Main dashboard with statistics
+- **`loans/`**: Loan/borrow management
+- **`members/`**: Member/student management
+- **`settings/`**: User profile, preferences, security
+
+#### **`src/services/`** - External Services
+- **`api/`**: API client and endpoint definitions
+  - `client.ts`: Axios instance with auth interceptors
+  - `*.api.ts`: Resource-specific API calls
+- **`constants/`**: Application constants (categories, etc.)
+- **`utils/`**: Service utilities (pagination, filtering, delay)
+
+#### **`src/stores/`** - Global State (Zustand)
+- **`themeStore.ts`**: Dark mode toggle and persistence
+- **`uiStore.ts`**: UI state (sidebar open/close, etc.)
+
+#### **`src/types/`** - TypeScript Definitions
+- Entity types: `Book`, `Member`, `Loan`, `Admin`
+- API request/response types
+- Centralized type exports
+
+#### **`src/utils/`** - Global Utilities
+- **`cn.ts`**: Tailwind className merge utility (using `clsx` + `tailwind-merge`)
+
+#### **`src-tauri/`** - Desktop App (Rust)
+- Tauri configuration for cross-platform desktop builds
+- App icons and build scripts
 
 ---
 
@@ -220,17 +272,20 @@ frontend-perpus/
 | Resource | Methods | Auth |
 |----------|---------|------|
 | `/admin/login` | POST | ❌ |
-| `/admin/register` | POST | ❌ |
+| `/admin/me` | GET, PUT | ✅ |
 | `/books` | GET, POST, PUT, DELETE | ✅ |
 | `/members` | GET, POST, PUT, DELETE | ✅ |
-| `/loans` | GET, POST, PUT, DELETE | ✅ |
+| `/loans` | GET, POST, PUT | ✅ |
+| `/loans/:id/return` | PUT | ✅ |
 
-### API Client
+### API Client Features
 
 - **Base URL**: `VITE_API_BASE_URL` from `.env`
-- **Auth**: JWT token in `Authorization: Bearer <token>`
+- **Authentication**: JWT token in `Authorization: Bearer <token>`
+- **Auto-retry**: 1 retry on failure
 - **Timeout**: 10 seconds
 - **Auto-redirect**: 401 → `/login`
+- **Error handling**: Centralized error interceptor
 
 ---
 
@@ -240,8 +295,9 @@ frontend-perpus/
 
 ```bash
 # Web Development
-npm run dev          # Start Vite dev server
+npm run dev          # Start Vite dev server (http://localhost:5173)
 npm run build        # Build for production
+npm run preview      # Preview production build
 npm run lint         # Run ESLint
 
 # Desktop Development
@@ -251,9 +307,9 @@ npm run tauri:build  # Build desktop installers
 
 ### Development Workflow
 
-1. Start backend: `cd ../backend-perpus && bun run dev`
-2. Start frontend: `npm run dev` or `npm run tauri:dev`
-3. Login with admin credentials
+1. **Start backend**: `cd ../backend-perpus && bun run dev`
+2. **Start frontend**: `npm run dev` or `npm run tauri:dev`
+3. **Login**: Use admin credentials from backend
 
 ---
 
@@ -262,18 +318,23 @@ npm run tauri:build  # Build desktop installers
 ### Web Deployment
 
 ```bash
-# Build
+# Build for production
 npm run build
 
 # Output: dist/
+# Deploy to: Vercel, Netlify, Cloudflare Pages
 ```
 
-Deploy to: Vercel, Netlify, or Cloudflare Pages
+**Environment Variables** (Production):
+```env
+VITE_API_BASE_URL=https://your-api-domain.com
+VITE_APP_NAME=PBJT Library Management System
+```
 
 ### Desktop Deployment
 
 ```bash
-# Build installers
+# Build installers for current platform
 npm run tauri:build
 
 # Output: src-tauri/target/release/bundle/
@@ -289,7 +350,10 @@ npm run tauri:build
 git tag v1.0.0
 git push origin v1.0.0
 
-# GitHub Actions will build and release automatically
+# GitHub Actions will:
+# 1. Build for Windows, macOS, Linux
+# 2. Create GitHub Release
+# 3. Upload installers as assets
 ```
 
 ---
@@ -298,21 +362,29 @@ git push origin v1.0.0
 
 ### Colors
 
-**Light Mode**: Blue primary (#2563eb), Slate background  
-**Dark Mode**: Slate-950 background, proper contrast ratios
+**Light Mode**:
+- Primary: Blue (#2563eb)
+- Background: White/Slate-50
+- Text: Slate-900
+
+**Dark Mode**:
+- Primary: Blue-400
+- Background: Slate-950
+- Text: Slate-50
 
 ### Features
-- WCAG AA compliant
-- Smooth transitions (200ms)
-- Responsive design (mobile, tablet, desktop)
-- Persistent theme preference
+- ✅ WCAG AA compliant contrast ratios
+- ✅ Smooth transitions (200ms)
+- ✅ Responsive design (mobile, tablet, desktop)
+- ✅ Persistent theme preference (localStorage)
+- ✅ System preference detection
 
 ---
 
 ## 🐛 Troubleshooting
 
 ### CORS Errors
-Ensure backend allows `http://localhost:5173` in CORS config.
+Ensure backend allows `http://localhost:5173` in CORS configuration.
 
 ### Connection Refused
 - Check backend is running: `curl http://localhost:3000/books`
@@ -320,15 +392,45 @@ Ensure backend allows `http://localhost:5173` in CORS config.
 
 ### Tauri Build Fails
 
-**Windows**: Install Visual Studio Build Tools  
-**macOS**: `xcode-select --install`  
-**Linux**: 
+**Windows**: Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/)
+
+**macOS**: 
+```bash
+xcode-select --install
+```
+
+**Linux**:
 ```bash
 sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 ```
 
 ### White Inputs in Dark Mode
-Hard refresh: `Ctrl + Shift + R`
+Hard refresh browser: `Ctrl + Shift + R` (Windows/Linux) or `Cmd + Shift + R` (macOS)
+
+---
+
+## 📦 Dependencies
+
+### Production Dependencies
+- **React 19** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **Tailwind CSS** - Styling
+- **TanStack Query** - Data fetching & caching
+- **Zustand** - State management
+- **React Hook Form** - Form handling
+- **Zod** - Schema validation
+- **Axios** - HTTP client
+- **React Router** - Routing
+- **Heroicons** - Icons
+- **Sonner** - Toast notifications
+- **Tauri** - Desktop app framework
+
+### Development Dependencies
+- **ESLint** - Code linting
+- **TypeScript ESLint** - TS linting
+- **PostCSS** - CSS processing
+- **Autoprefixer** - CSS vendor prefixes
 
 ---
 
@@ -345,4 +447,4 @@ Politeknik Baja Tegal - Teknik Informatika
 
 ---
 
-**Built with React, TypeScript, Tailwind CSS, and Tauri**
+**Built with ❤️ using React, TypeScript, Tailwind CSS, and Tauri**

@@ -48,8 +48,6 @@ const App: React.FC = () => {
               </PublicRoute>
             }
           />
-
-          {/* Register Page */}
           <Route
             path="/register"
             element={
@@ -58,6 +56,7 @@ const App: React.FC = () => {
               </PublicRoute>
             }
           />
+
 
           {/* Protected Routes with AppShell */}
           <Route

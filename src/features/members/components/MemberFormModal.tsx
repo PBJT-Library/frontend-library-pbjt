@@ -39,7 +39,7 @@ export const MemberFormModal: React.FC<MemberFormModalProps> = ({
                 reset(member);
             } else {
                 reset({
-                    nim: '',
+                    id: '',
                     name: '',
                     study_program: '',
                     semester: 1,
@@ -71,9 +71,9 @@ export const MemberFormModal: React.FC<MemberFormModalProps> = ({
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="space-y-4">
                     <Input
-                        label="NIM"
-                        {...register('nim')}
-                        error={errors.nim?.message}
+                        label="NIM (Student ID)"
+                        {...register('id')}
+                        error={errors.id?.message}
                         placeholder="e.g., 23190001"
                         helperText="Nomor Induk Mahasiswa (8-15 digit angka)"
                     />

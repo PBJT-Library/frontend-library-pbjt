@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { useAuthStore } from '../store/authStore';
 import { registerSchema, type RegisterFormData } from '../schemas/registerSchema';
 import { BrandPanel } from './BrandPanel';
 
 export const RegisterPage: React.FC = () => {
     const navigate = useNavigate();
+    const register = useAuthStore((state) => state.register);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     const {
-        register,
+        register: registerField,
         handleSubmit,
         formState: { errors, isSubmitting }
     } = useForm<RegisterFormData>({
@@ -22,7 +24,7 @@ export const RegisterPage: React.FC = () => {
     });
 
     // Subtle parallax effect
-    useEffect(() => {
+    React.useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             const x = (e.clientX / window.innerWidth - 0.5) * 0.5;
             const y = (e.clientY / window.innerHeight - 0.5) * 0.5;
@@ -33,15 +35,13 @@ export const RegisterPage: React.FC = () => {
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
-    const onSubmit = async (_data: RegisterFormData) => {
+    const onSubmit = async (data: RegisterFormData) => {
         try {
-            // Simulate registration
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            toast.success('Pendaftaran berhasil! Silakan login.');
+            await register(data.username, data.password);
+            toast.success('Registration successful! Please login with your credentials.');
             navigate('/login');
         } catch (error) {
-            toast.error('Pendaftaran gagal. Silakan coba lagi.');
+            toast.error((error as Error).message || 'Registration failed. Username may already exist.');
         }
     };
 
@@ -101,58 +101,36 @@ export const RegisterPage: React.FC = () => {
                         }}
                     >
                         <div className="grid lg:grid-cols-2 flex-1">
-                            {/* LEFT SECTION - Register Form (SWAPPED) */}
-                            <div className="bg-white p-8 sm:p-10 lg:p-12 flex flex-col justify-center order-2 lg:order-1 overflow-y-auto">
+                            {/* LEFT SECTION - Branding */}
+                            <BrandPanel mousePosition={mousePosition} />
+
+                            {/* RIGHT SECTION - Register Form */}
+                            <div className="bg-white p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
                                 <div className="max-w-md mx-auto w-full">
                                     {/* Form Header */}
-                                    <div className="mb-6 animate-fade-in">
+                                    <div className="mb-8">
                                         <h2 className="text-3xl font-bold text-slate-900 mb-2">
-                                            Daftar Akun Baru
+                                            Create Account
                                         </h2>
                                         <p className="text-slate-600">
-                                            Lengkapi formulir untuk membuat akun
+                                            Register to get started
                                         </p>
                                     </div>
 
                                     {/* Register Form */}
-                                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                                        {/* Name Input */}
-                                        <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                                            <label className="block text-sm font-medium text-slate-700">
-                                                Nama Lengkap
-                                            </label>
-                                            <input
-                                                type="text"
-                                                {...register('name')}
-                                                disabled={isSubmitting}
-                                                className={`
-                                                    w-full px-4 py-3 
-                                                    bg-slate-50 border-2 ${errors.name ? 'border-red-500' : 'border-slate-200'}
-                                                    rounded-xl 
-                                                    text-slate-900 placeholder-slate-400
-                                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white
-                                                    transition-all duration-300 ease-in-out
-                                                    hover:border-slate-300 hover:bg-white hover:shadow-sm
-                                                    disabled:opacity-50 disabled:cursor-not-allowed
-                                                `}
-                                                placeholder="Nama lengkap Anda"
-                                            />
-                                            {errors.name && (
-                                                <p className="text-sm text-red-600 mt-1 animate-fade-in">{errors.name.message}</p>
-                                            )}
-                                        </div>
-
+                                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                                         {/* Username Input */}
-                                        <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.15s' }}>
+                                        <div className="space-y-2">
                                             <label className="block text-sm font-medium text-slate-700">
                                                 Username
                                             </label>
                                             <input
                                                 type="text"
-                                                {...register('username')}
+                                                autoComplete="username"
+                                                {...registerField('username')}
                                                 disabled={isSubmitting}
                                                 className={`
-                                                    w-full px-4 py-3 
+                                                    w-full px-4 py-3.5 
                                                     bg-slate-50 border-2 ${errors.username ? 'border-red-500' : 'border-slate-200'}
                                                     rounded-xl 
                                                     text-slate-900 placeholder-slate-400
@@ -161,25 +139,26 @@ export const RegisterPage: React.FC = () => {
                                                     hover:border-slate-300 hover:bg-white hover:shadow-sm
                                                     disabled:opacity-50 disabled:cursor-not-allowed
                                                 `}
-                                                placeholder="Pilih username unik"
+                                                placeholder="Choose a username (min. 3 characters)"
                                             />
                                             {errors.username && (
-                                                <p className="text-sm text-red-600 mt-1 animate-fade-in">{errors.username.message}</p>
+                                                <p className="text-sm text-red-600 mt-1">{errors.username.message}</p>
                                             )}
                                         </div>
 
                                         {/* Password Input */}
-                                        <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                                        <div className="space-y-2">
                                             <label className="block text-sm font-medium text-slate-700">
                                                 Password
                                             </label>
                                             <div className="relative">
                                                 <input
                                                     type={showPassword ? 'text' : 'password'}
-                                                    {...register('password')}
+                                                    autoComplete="new-password"
+                                                    {...registerField('password')}
                                                     disabled={isSubmitting}
                                                     className={`
-                                                        w-full px-4 py-3 pr-12
+                                                        w-full px-4 py-3.5 pr-12
                                                         bg-slate-50 border-2 ${errors.password ? 'border-red-500' : 'border-slate-200'}
                                                         rounded-xl 
                                                         text-slate-900 placeholder-slate-400
@@ -188,7 +167,7 @@ export const RegisterPage: React.FC = () => {
                                                         hover:border-slate-300 hover:bg-white hover:shadow-sm
                                                         disabled:opacity-50 disabled:cursor-not-allowed
                                                     `}
-                                                    placeholder="Minimal 6 karakter"
+                                                    placeholder="Create a password (min. 6 characters)"
                                                 />
                                                 <button
                                                     type="button"
@@ -205,22 +184,23 @@ export const RegisterPage: React.FC = () => {
                                                 </button>
                                             </div>
                                             {errors.password && (
-                                                <p className="text-sm text-red-600 mt-1 animate-fade-in">{errors.password.message}</p>
+                                                <p className="text-sm text-red-600 mt-1">{errors.password.message}</p>
                                             )}
                                         </div>
 
                                         {/* Confirm Password Input */}
-                                        <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.25s' }}>
+                                        <div className="space-y-2">
                                             <label className="block text-sm font-medium text-slate-700">
-                                                Konfirmasi Password
+                                                Confirm Password
                                             </label>
                                             <div className="relative">
                                                 <input
                                                     type={showConfirmPassword ? 'text' : 'password'}
-                                                    {...register('confirmPassword')}
+                                                    autoComplete="new-password"
+                                                    {...registerField('confirmPassword')}
                                                     disabled={isSubmitting}
                                                     className={`
-                                                        w-full px-4 py-3 pr-12
+                                                        w-full px-4 py-3.5 pr-12
                                                         bg-slate-50 border-2 ${errors.confirmPassword ? 'border-red-500' : 'border-slate-200'}
                                                         rounded-xl 
                                                         text-slate-900 placeholder-slate-400
@@ -229,7 +209,7 @@ export const RegisterPage: React.FC = () => {
                                                         hover:border-slate-300 hover:bg-white hover:shadow-sm
                                                         disabled:opacity-50 disabled:cursor-not-allowed
                                                     `}
-                                                    placeholder="Ulangi password"
+                                                    placeholder="Confirm your password"
                                                 />
                                                 <button
                                                     type="button"
@@ -246,7 +226,7 @@ export const RegisterPage: React.FC = () => {
                                                 </button>
                                             </div>
                                             {errors.confirmPassword && (
-                                                <p className="text-sm text-red-600 mt-1 animate-fade-in">{errors.confirmPassword.message}</p>
+                                                <p className="text-sm text-red-600 mt-1">{errors.confirmPassword.message}</p>
                                             )}
                                         </div>
 
@@ -266,10 +246,8 @@ export const RegisterPage: React.FC = () => {
                                                 active:scale-[0.98]
                                                 transition-all duration-300 ease-out
                                                 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0
-                                                mt-6
-                                                animate-fade-in
+                                                mt-8
                                             "
-                                            style={{ animationDelay: '0.3s' }}
                                         >
                                             {isSubmitting ? (
                                                 <span className="flex items-center justify-center gap-2">
@@ -277,33 +255,27 @@ export const RegisterPage: React.FC = () => {
                                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                                     </svg>
-                                                    Memproses...
+                                                    Creating Account...
                                                 </span>
                                             ) : (
-                                                'Daftar'
+                                                'Create Account'
                                             )}
                                         </button>
 
                                         {/* Login Link */}
-                                        <div className="mt-4 text-center animate-fade-in" style={{ animationDelay: '0.35s' }}>
+                                        <div className="mt-6 text-center">
                                             <p className="text-sm text-slate-600">
-                                                Sudah punya akun?{' '}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => navigate('/login')}
-                                                    className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200 hover:underline"
+                                                Already have an account?{' '}
+                                                <Link
+                                                    to="/login"
+                                                    className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
                                                 >
-                                                    Masuk sekarang
-                                                </button>
+                                                    Sign in
+                                                </Link>
                                             </p>
                                         </div>
                                     </form>
                                 </div>
-                            </div>
-
-                            {/* RIGHT SECTION - Branding (SWAPPED) */}
-                            <div className="order-1 lg:order-2">
-                                <BrandPanel mousePosition={mousePosition} />
                             </div>
                         </div>
                     </div>

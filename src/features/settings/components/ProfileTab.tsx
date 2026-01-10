@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -6,10 +6,12 @@ import { PencilIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { profileSchema, type ProfileFormData } from '../schemas/profileSchema';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { Input, Button, Card } from '@/components/ui';
+import { adminApi } from '@/services/api';
 
 export const ProfileTab: React.FC = () => {
     const { user, setUser } = useAuthStore();
     const [isEditing, setIsEditing] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const {
         register,
@@ -23,8 +25,39 @@ export const ProfileTab: React.FC = () => {
         },
     });
 
+    // Fetch admin profile from backend on mount
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await adminApi.getProfile();
+                const adminData = response.admin;
+
+                // Update form with backend data
+                reset({ name: adminData.username });
+
+                // Update auth store
+                setUser({
+                    id: adminData.id,
+                    name: adminData.username,
+                    role: 'admin'
+                });
+            } catch (error) {
+                toast.error('Failed to load profile');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, [reset, setUser]);
+
     const onSubmit = async (data: ProfileFormData) => {
         try {
+            // Call API to update username
+            await adminApi.updateProfile({
+                username: data.name
+            });
+
             // Update user in store
             setUser({
                 ...user!,
@@ -34,7 +67,7 @@ export const ProfileTab: React.FC = () => {
             toast.success('Profile updated successfully');
             setIsEditing(false);
         } catch (error) {
-            toast.error('Failed to update profile');
+            toast.error((error as Error).message || 'Failed to update profile');
         }
     };
 

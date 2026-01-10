@@ -2,9 +2,10 @@ import { z } from 'zod';
 import { BOOK_CATEGORIES } from '@/services/constants/categories';
 
 export const bookSchema = z.object({
+    id: z.string().min(1, 'Book ID is required').max(20, 'Book ID too long'),
     title: z.string().min(1, 'Title is required').max(255, 'Title too long'),
     category: z.enum(BOOK_CATEGORIES as any, {
-        errorMap: () => ({ message: 'Please select a valid category' })
+        message: 'Please select a valid category'
     }),
     author: z.string().min(1, 'Author is required').max(255, 'Author too long'),
     publisher: z.string().min(1, 'Publisher is required').max(255, 'Publisher too long'),

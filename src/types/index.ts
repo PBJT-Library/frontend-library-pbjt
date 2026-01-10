@@ -5,7 +5,6 @@ export type { Loan } from './loan';
 export type {
     Admin,
     LoginRequest,
-    RegisterRequest,
     LoginResponse,
     AuthResponse
 } from './admin';

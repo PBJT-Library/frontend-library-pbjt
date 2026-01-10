@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { loansApi, type LoansParams, type CreateLoanData } from '@/services/api';
-import type { Loan } from '@/types';
 import { toast } from 'sonner';
 
 /**

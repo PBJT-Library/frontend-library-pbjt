@@ -30,6 +30,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
     } = useForm<BookFormData>({
         resolver: zodResolver(bookSchema),
         defaultValues: book ? {
+            id: book.id,
             title: book.title,
             category: book.category,
             author: book.author,
@@ -37,6 +38,10 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
             year: book.year,
             stock: book.stock,
         } : {
+            id: '',
+            title: '',
+            author: '',
+            publisher: '',
             year: new Date().getFullYear(),
             stock: 1,
             category: 'Programming',
@@ -48,6 +53,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
         if (isOpen) {
             if (book) {
                 reset({
+                    id: book.id,
                     title: book.title,
                     category: book.category,
                     author: book.author,
@@ -57,6 +63,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                 });
             } else {
                 reset({
+                    id: '',
                     title: '',
                     category: 'Programming',
                     author: '',
@@ -90,6 +97,19 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
         >
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid grid-cols-2 gap-4">
+                    {/* Book ID - Only show in create mode */}
+                    {!isEditMode && (
+                        <div className="col-span-2">
+                            <Input
+                                label="Book ID"
+                                {...register('id')}
+                                error={errors.id?.message}
+                                placeholder="e.g., BK001, BK002"
+                                helperText="Unique identifier for the book (e.g., BK001)"
+                            />
+                        </div>
+                    )}
+
                     {/* Title */}
                     <div className="col-span-2">
                         <Input
@@ -115,7 +135,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                         <Select
                             label="Category"
                             {...register('category')}
-                            error={errors.category?.message}
+                            error={errors.category?.message as string}
                         >
                             <optgroup label="📚 Academic Works">
                                 {ACADEMIC_CATEGORIES.map(cat => (

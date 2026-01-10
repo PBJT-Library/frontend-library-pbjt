@@ -41,7 +41,20 @@ export const LoginPage: React.FC = () => {
             toast.success('Selamat datang kembali!');
             navigate('/dashboard');
         } catch (error) {
-            toast.error('Username atau password salah. Silakan coba lagi.');
+            const errorMessage = (error as Error).message;
+
+            // Check if error is about user not found
+            if (errorMessage.includes('not found') || errorMessage.includes('tidak ditemukan')) {
+                toast.error('User tidak ditemukan. Silakan registrasi akun terlebih dahulu.', {
+                    duration: 5000,
+                    action: {
+                        label: 'Register',
+                        onClick: () => navigate('/register')
+                    }
+                });
+            } else {
+                toast.error(errorMessage || 'Username atau password salah. Silakan coba lagi.');
+            }
         }
     };
 
@@ -126,6 +139,7 @@ export const LoginPage: React.FC = () => {
                                             </label>
                                             <input
                                                 type="text"
+                                                autoComplete="username"
                                                 {...register('username')}
                                                 disabled={isSubmitting}
                                                 className={`
@@ -153,6 +167,7 @@ export const LoginPage: React.FC = () => {
                                             <div className="relative">
                                                 <input
                                                     type={showPassword ? 'text' : 'password'}
+                                                    autoComplete="current-password"
                                                     {...register('password')}
                                                     disabled={isSubmitting}
                                                     className={`

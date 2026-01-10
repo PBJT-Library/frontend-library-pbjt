@@ -70,38 +70,21 @@ export const booksApi = {
     /**
      * POST /books - Create new book
      */
-    createBook: async (data: Omit<Book, 'uuid'>): Promise<Book> => {
-        try {
-            const response = await apiClient.post<Book>('/books', data);
-            return response.data;
-        } catch (error) {
-            console.error('Error creating book:', error);
-            throw error;
-        }
+    createBook: async (data: Book): Promise<void> => {
+        await apiClient.post('/books', data);
     },
 
     /**
      * PUT /books/:id - Update book
      */
-    updateBook: async (id: string, data: Partial<Book>): Promise<Book> => {
-        try {
-            const response = await apiClient.put<Book>(`/books/${id}`, data);
-            return response.data;
-        } catch (error) {
-            console.error(`Error updating book ${id}:`, error);
-            throw new Error('Failed to update book');
-        }
+    updateBook: async (id: string, data: Partial<Book>): Promise<void> => {
+        await apiClient.put(`/books/${id}`, data);
     },
 
     /**
      * DELETE /books/:id - Delete book
      */
     deleteBook: async (id: string): Promise<void> => {
-        try {
-            await apiClient.delete(`/books/${id}`);
-        } catch (error) {
-            console.error(`Error deleting book ${id}:`, error);
-            throw new Error('Failed to delete book');
-        }
+        await apiClient.delete(`/books/${id}`);
     },
 };

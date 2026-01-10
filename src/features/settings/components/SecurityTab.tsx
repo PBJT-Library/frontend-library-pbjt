@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { LockClosedIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { passwordSchema, type PasswordFormData } from '../schemas/passwordSchema';
 import { Input, Button, Card } from '@/components/ui';
+import { adminApi } from '@/services/api';
 
 export const SecurityTab: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
@@ -20,15 +21,16 @@ export const SecurityTab: React.FC = () => {
 
     const onSubmit = async (data: PasswordFormData) => {
         try {
-            // Simulate password change
-            // In real app, call API here
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Call API to change password
+            await adminApi.updateProfile({
+                password: data.newPassword
+            });
 
             toast.success('Password changed successfully');
             reset();
             setIsEditing(false);
         } catch (error) {
-            toast.error('Failed to change password');
+            toast.error((error as Error).message || 'Failed to change password');
         }
     };
 
@@ -69,6 +71,7 @@ export const SecurityTab: React.FC = () => {
                     <Input
                         label="Current Password"
                         type="password"
+                        autoComplete="current-password"
                         {...register('currentPassword')}
                         error={errors.currentPassword?.message}
                         placeholder="Enter your current password"
@@ -78,6 +81,7 @@ export const SecurityTab: React.FC = () => {
                     <Input
                         label="New Password"
                         type="password"
+                        autoComplete="new-password"
                         {...register('newPassword')}
                         error={errors.newPassword?.message}
                         placeholder="Enter new password (min. 6 characters)"
@@ -88,6 +92,7 @@ export const SecurityTab: React.FC = () => {
                     <Input
                         label="Confirm New Password"
                         type="password"
+                        autoComplete="new-password"
                         {...register('confirmPassword')}
                         error={errors.confirmPassword?.message}
                         placeholder="Confirm your new password"

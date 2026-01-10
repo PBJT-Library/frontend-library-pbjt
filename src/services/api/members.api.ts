@@ -68,38 +68,21 @@ export const membersApi = {
     /**
      * POST /members - Create new member
      */
-    createMember: async (data: Omit<Member, 'uuid'>): Promise<Member> => {
-        try {
-            const response = await apiClient.post<Member>('/members', data);
-            return response.data;
-        } catch (error) {
-            console.error('Error creating member:', error);
-            throw error;
-        }
+    createMember: async (data: Member): Promise<void> => {
+        await apiClient.post('/members', data);
     },
 
     /**
      * PUT /members/:id - Update member
      */
-    updateMember: async (id: string, data: Partial<Member>): Promise<Member> => {
-        try {
-            const response = await apiClient.put<Member>(`/members/${id}`, data);
-            return response.data;
-        } catch (error) {
-            console.error(`Error updating member ${id}:`, error);
-            throw new Error('Failed to update member');
-        }
+    updateMember: async (id: string, data: Partial<Member>): Promise<void> => {
+        await apiClient.put(`/members/${id}`, data);
     },
 
     /**
      * DELETE /members/:id - Delete member
      */
     deleteMember: async (id: string): Promise<void> => {
-        try {
-            await apiClient.delete(`/members/${id}`);
-        } catch (error) {
-            console.error(`Error deleting member ${id}:`, error);
-            throw new Error('Failed to delete member');
-        }
+        await apiClient.delete(`/members/${id}`);
     },
 };

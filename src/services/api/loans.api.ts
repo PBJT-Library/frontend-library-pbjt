@@ -16,8 +16,8 @@ export interface LoansParams extends PaginationParams {
 }
 
 export interface CreateLoanData {
-    book_uuid: string;    // Backend uses UUID
-    member_uuid: string;  // Backend uses UUID
+    book_id: string;      // Custom book ID (BK001)
+    member_id: string;    // Custom member ID / NIM (23190001)
     quantity: number;
 }
 
@@ -78,29 +78,14 @@ export const loansApi = {
     /**
      * POST /loans - Create new loan (borrow book)
      */
-    createLoan: async (data: CreateLoanData): Promise<Loan> => {
-        try {
-            const response = await apiClient.post<Loan>('/loans', data);
-            return response.data;
-        } catch (error) {
-            console.error('Error creating loan:', error);
-            throw error;
-        }
+    createLoan: async (data: CreateLoanData): Promise<void> => {
+        await apiClient.post('/loans', data);
     },
 
     /**
-     * PUT /loans/:id - Update loan (return book)
+     * PATCH /loans/:id/return - Return book
      */
-    returnBook: async (id: string): Promise<Loan> => {
-        try {
-            // Update loan with return_date
-            const response = await apiClient.put<Loan>(`/loans/${id}`, {
-                return_date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
-            });
-            return response.data;
-        } catch (error) {
-            console.error(`Error returning book for loan ${id}:`, error);
-            throw new Error('Failed to return book');
-        }
+    returnBook: async (id: string): Promise<void> => {
+        await apiClient.patch(`/loans/${id}/return`);
     },
 };

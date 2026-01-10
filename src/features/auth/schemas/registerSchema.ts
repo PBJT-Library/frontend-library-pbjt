@@ -1,19 +1,15 @@
 import { z } from 'zod';
 
 export const registerSchema = z.object({
-    name: z.string()
-        .min(3, 'Nama harus minimal 3 karakter')
-        .max(100, 'Nama terlalu panjang'),
     username: z.string()
-        .min(3, 'Username minimal 3 karakter')
-        .max(50, 'Username maksimal 50 karakter'),
+        .min(3, 'Username must be at least 3 characters')
+        .max(50, 'Username must be less than 50 characters'),
     password: z.string()
-        .min(6, 'Password harus minimal 6 karakter')
-        .max(100, 'Password terlalu panjang'),
+        .min(6, 'Password must be at least 6 characters')
+        .max(100, 'Password must be less than 100 characters'),
     confirmPassword: z.string()
-        .min(1, 'Konfirmasi password wajib diisi'),
 }).refine((data) => data.password === data.confirmPassword, {
-    message: "Password tidak cocok",
+    message: "Passwords don't match",
     path: ["confirmPassword"],
 });
 
