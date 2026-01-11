@@ -28,3 +28,41 @@
     border: 2px solid rgb(100 116 139) !important;
   }
 }
+
+/* Select Dropdown Options Styling */
+select option {
+  background-color: #ffffff;
+  color: #1e293b;
+  padding: 10px 12px;
+  font-weight: 500;
+}
+
+select option:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+select option:checked,
+select option:focus {
+  background: linear-gradient(to right, #dbeafe, #e0f2fe) !important;
+  color: #0369a1 !important;
+  font-weight: 600;
+}
+
+/* Dark mode select options */
+.dark select option {
+  background-color: #334155;
+  color: #f1f5f9;
+}
+
+.dark select option:hover {
+  background-color: #475569 !important;
+  color: #ffffff !important;
+}
+
+.dark select option:checked,
+.dark select option:focus {
+  background: linear-gradient(to right, #1e3a8a, #1e40af) !important;
+  color: #bfdbfe !important;
+  font-weight: 600;
+}
