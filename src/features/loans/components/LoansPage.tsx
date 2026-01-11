@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
 import { LoansTable } from './LoansTable';
@@ -8,6 +8,8 @@ import { useLoans, useReturnBook } from '../hooks/useLoans';
 import { Button, Card } from '@/components/ui';
 import type { Loan } from '@/types';
 
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+
 export const LoansPage: React.FC = () => {
     const [page, setPage] = useState(1);
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'returned'>('all');
@@ -15,6 +17,9 @@ export const LoansPage: React.FC = () => {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
+
+    const [books, setBooks] = useState([]);
+    const [members, setMembers] = useState([]);
 
     const limit = 10;
 
@@ -29,6 +34,64 @@ export const LoansPage: React.FC = () => {
     });
 
     const returnMutation = useReturnBook();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            console.log('=== START FETCHING ===');
+            console.log('API_URL:', API_URL);
+            
+            try {
+                // Fetch books
+                console.log('Fetching books from:', `${API_URL}/books`);
+                const bookRes = await fetch(`${API_URL}/books`);
+                console.log('Books response status:', bookRes.status, bookRes.ok);
+                
+                // Fetch members
+                console.log('Fetching members from:', `${API_URL}/members`);
+                const memberRes = await fetch(`${API_URL}/members`);
+                console.log('Members response status:', memberRes.status, memberRes.ok);
+    
+                if (!bookRes.ok || !memberRes.ok) {
+                    throw new Error(`Failed: Books ${bookRes.status}, Members ${memberRes.status}`);
+                }
+    
+                // Parse JSON
+                console.log('Parsing books JSON...');
+                const booksData = await bookRes.json();
+                console.log('Books data:', booksData);
+                
+                console.log('Parsing members JSON...');
+                const membersData = await memberRes.json();
+                console.log('Members data:', membersData);
+    
+                // ✅ Handle both formats: array atau { data: array }
+                const booksArray = Array.isArray(booksData) ? booksData : (booksData?.data || []);
+                const membersArray = Array.isArray(membersData) ? membersData : (membersData?.data || []);
+                
+                console.log('Setting books state:', booksArray.length, 'items');
+                console.log('Setting members state:', membersArray.length, 'items');
+    
+                setBooks(booksArray);
+                setMembers(membersArray);
+                
+                console.log('=== FETCH SUCCESS ===');
+                toast.success('Data loaded successfully');
+            } catch (error) {
+                console.error('=== FETCH FAILED ===');
+                console.error('Error type:', error instanceof TypeError ? 'TypeError (network)' : 'Other');
+                console.error('Error message:', error.message);
+                console.error('Full error:', error);
+                
+                toast.error('Failed to load data from backend');
+                
+                // ✅ Set empty array untuk prevent loading forever
+                setBooks([]);
+                setMembers([]);
+            }
+        };
+        
+        fetchData();
+    }, []);
 
     const handleReturn = async (loan: Loan) => {
         if (window.confirm(`Kembalikan buku "${loan.book_title}"?`)) {
@@ -52,12 +115,38 @@ export const LoansPage: React.FC = () => {
         setIsEditOpen(true);
     };
 
-    const handleSaveEdit = async (_loanId: string, _data: { loan_date: string; quantity: number }) => {
+    const handleSaveEdit = async (
+        loanId: string, 
+        data: { 
+            book_id: string;
+            member_id: string;
+            loan_date: string; 
+            quantity: number 
+        }
+    ) => {
         try {
-            // TODO: Implement API call to update loan
+            const response = await fetch(`${API_URL}/loans/${loanId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update loan');
+            }
+
             toast.success('Loan updated successfully');
-            // Refetch data here
+            
+            // Refetch loans data
+            setPage(prev => prev)
+            
+            // Close modal
+            setIsEditOpen(false);
+            setSelectedLoan(null);
         } catch (error) {
+            console.error('Error updating loan:', error);
             toast.error('Failed to update loan');
             throw error;
         }
@@ -182,6 +271,8 @@ export const LoansPage: React.FC = () => {
                     setSelectedLoan(null);
                 }}
                 onSave={handleSaveEdit}
+                books={books}
+                members={members}
             />
         </div>
     );

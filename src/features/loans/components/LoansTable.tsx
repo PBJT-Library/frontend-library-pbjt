@@ -64,7 +64,7 @@ export const LoansTable: React.FC<LoansTableProps> = ({
                     return (
                         <TableRow key={loan.id}>
                             <TableCell>
-                                <div className="font-mono text-xs text-slate-600 dark:text-slate-400">{loan.uuid}</div>
+                                <div className="font-mono text-xs text-slate-600 dark:text-slate-400">{loan.id}</div>
                             </TableCell>
                             <TableCell>
                                 <div className="font-medium text-slate-900 dark:text-slate-50">{loan.member_name}</div>
