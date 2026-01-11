@@ -11,6 +11,8 @@ import { useAuthStore } from '@/features/auth/store/authStore';
 import { useBooks } from '@/features/books/hooks/useBooks';
 import { useMembers } from '@/features/members/hooks/useMembers';
 import { useLoans } from '@/features/loans/hooks/useLoans';
+import { usePreferences } from '@/hooks/usePreferences';
+import { formatDate } from '@/utils/dateFormatter';
 import { Card, Badge } from '@/components/ui';
 
 interface KPICardProps {
@@ -50,6 +52,7 @@ const KPICard: React.FC<KPICardProps> = ({ title, value, icon: Icon, color, bgCo
 export const Dashboard: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuthStore();
+    const { dateFormat } = usePreferences();
 
     // Fetch all data for KPIs
     const { data: booksData } = useBooks({ page: 1, limit: 1000 });
@@ -72,14 +75,6 @@ export const Dashboard: React.FC = () => {
     const totalMembers = members.length;
     const activeLoans = allLoans.filter(loan => !loan.return_date).length;
     const returnedLoans = allLoans.filter(loan => loan.return_date).length;
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('id-ID', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        });
-    };
 
     return (
         <div className="space-y-6">
@@ -216,7 +211,7 @@ export const Dashboard: React.FC = () => {
                                                 {loan.book_title}
                                             </td>
                                             <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
-                                                {formatDate(loan.loan_date)}
+                                                {formatDate(loan.loan_date, dateFormat)}
                                             </td>
                                             <td className="px-4 py-3">
                                                 <Badge variant={!loan.return_date ? 'warning' : 'success'} size="sm">
