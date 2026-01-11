@@ -7,8 +7,10 @@ import { useBooks, useDeleteBook } from '../hooks/useBooks';
 import { Button, Card, Input, Select } from '@/components/ui';
 import type { Book } from '@/types';
 import { ACADEMIC_CATEGORIES, REGULAR_CATEGORIES } from '@/services/constants/categories';
+import { usePreferences } from '@/hooks/usePreferences';
 
 export const BooksPage: React.FC = () => {
+    const { itemsPerPage } = usePreferences();
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
@@ -17,12 +19,10 @@ export const BooksPage: React.FC = () => {
     const [editingBook, setEditingBook] = useState<Book | undefined>();
     const [deletingBook, setDeletingBook] = useState<Book | undefined>();
 
-    const limit = 10;
-
     // Fetch books with React Query
     const { data, isLoading, isError } = useBooks({
         page,
-        limit,
+        limit: itemsPerPage,
         filters: {
             search,
             category: categoryFilter || undefined,
