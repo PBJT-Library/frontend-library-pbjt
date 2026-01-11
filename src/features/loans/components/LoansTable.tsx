@@ -1,13 +1,16 @@
 import React from 'react';
-import { ArrowUturnLeftIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { ArrowUturnLeftIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { Loan } from '@/types';
 import { LoadingSpinner, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button } from '@/components/ui';
+import { usePreferences } from '@/hooks/usePreferences';
+import { formatDate } from '@/utils/dateFormatter';
 
 interface LoansTableProps {
     loans: Loan[];
     isLoading?: boolean;
     onReturn: (loan: Loan) => void;
     onEdit: (loan: Loan) => void;
+    onDelete: (loan: Loan) => void;
 }
 
 export const LoansTable: React.FC<LoansTableProps> = ({
@@ -15,7 +18,10 @@ export const LoansTable: React.FC<LoansTableProps> = ({
     isLoading,
     onReturn,
     onEdit,
+    onDelete,
 }) => {
+    const { dateFormat } = usePreferences();
+
     if (isLoading) {
         return (
             <div className="flex justify-center items-center py-12">
@@ -34,14 +40,6 @@ export const LoansTable: React.FC<LoansTableProps> = ({
             </div>
         );
     }
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('id-ID', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        });
-    };
 
     return (
         <Table>
@@ -64,7 +62,7 @@ export const LoansTable: React.FC<LoansTableProps> = ({
                     return (
                         <TableRow key={loan.id}>
                             <TableCell>
-                                <div className="font-mono text-xs text-slate-600 dark:text-slate-400">{loan.id}</div>
+                                <div className="font-mono text-xs text-slate-600 dark:text-slate-400">{loan.uuid}</div>
                             </TableCell>
                             <TableCell>
                                 <div className="font-medium text-slate-900 dark:text-slate-50">{loan.member_name}</div>
@@ -76,11 +74,11 @@ export const LoansTable: React.FC<LoansTableProps> = ({
                                 <div className="text-slate-600 dark:text-slate-300">{loan.quantity}</div>
                             </TableCell>
                             <TableCell>
-                                <div className="text-slate-600 dark:text-slate-300">{formatDate(loan.loan_date)}</div>
+                                <div className="text-slate-600 dark:text-slate-300">{formatDate(loan.loan_date, dateFormat)}</div>
                             </TableCell>
                             <TableCell>
                                 <div className="text-slate-600 dark:text-slate-300">
-                                    {loan.return_date ? formatDate(loan.return_date) : '-'}
+                                    {loan.return_date ? formatDate(loan.return_date, dateFormat) : '-'}
                                 </div>
                             </TableCell>
                             <TableCell>
@@ -90,7 +88,7 @@ export const LoansTable: React.FC<LoansTableProps> = ({
                             </TableCell>
                             <TableCell>
                                 <div className="flex justify-end gap-2">
-                                    {isActive && (
+                                    {isActive ? (
                                         <>
                                             <Button
                                                 size="sm"
@@ -109,6 +107,15 @@ export const LoansTable: React.FC<LoansTableProps> = ({
                                                 Return
                                             </Button>
                                         </>
+                                    ) : (
+                                        <Button
+                                            size="sm"
+                                            variant="destructive"
+                                            onClick={() => onDelete(loan)}
+                                            leftIcon={<TrashIcon className="w-4 h-4" />}
+                                        >
+                                            Delete
+                                        </Button>
                                     )}
                                 </div>
                             </TableCell>
