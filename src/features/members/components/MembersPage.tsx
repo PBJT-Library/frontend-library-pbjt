@@ -6,8 +6,10 @@ import { DeleteMemberDialog } from './DeleteMemberDialog';
 import { useMembers, useDeleteMember } from '../hooks/useMembers';
 import { Button, Card, Input, Select } from '@/components/ui';
 import type { Member } from '@/types';
+import { usePreferences } from '@/hooks/usePreferences';
 
 export const MembersPage: React.FC = () => {
+    const { itemsPerPage } = usePreferences();
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [studyProgramFilter, setStudyProgramFilter] = useState('');
@@ -16,11 +18,9 @@ export const MembersPage: React.FC = () => {
     const [editingMember, setEditingMember] = useState<Member | undefined>();
     const [deletingMember, setDeletingMember] = useState<Member | undefined>();
 
-    const limit = 10;
-
     const { data, isLoading, isError } = useMembers({
         page,
-        limit,
+        limit: itemsPerPage,
         filters: {
             search,
             study_program: studyProgramFilter || undefined,
