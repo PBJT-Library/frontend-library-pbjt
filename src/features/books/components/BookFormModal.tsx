@@ -202,7 +202,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                         variant="primary"
                         isLoading={isSubmitting}
                     >
-                        {isEditMode ? 'Update Book' : 'Create Book'}
+                        {isEditMode ? 'Update Book' : 'Add Book'}
                     </Button>
                 </ModalFooter>
             </form>

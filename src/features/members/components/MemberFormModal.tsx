@@ -117,7 +117,7 @@ export const MemberFormModal: React.FC<MemberFormModalProps> = ({
                         variant="primary"
                         isLoading={isSubmitting}
                     >
-                        {isEditMode ? 'Update Member' : 'Create Member'}
+                        {isEditMode ? 'Update Member' : 'Add Member'}
                     </Button>
                 </ModalFooter>
             </form>
