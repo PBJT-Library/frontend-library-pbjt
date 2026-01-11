@@ -88,4 +88,18 @@ export const loansApi = {
     returnBook: async (id: string): Promise<void> => {
         await apiClient.patch(`/loans/${id}/return`);
     },
+
+    /**
+     * PUT /loans/:id - Update loan
+     */
+    updateLoan: async (id: string, data: Partial<CreateLoanData>): Promise<void> => {
+        await apiClient.put(`/loans/${id}`, data);
+    },
+
+    /**
+     * DELETE /loans/:id - Delete loan
+     */
+    deleteLoan: async (id: string): Promise<void> => {
+        await apiClient.delete(`/loans/${id}`);
+    },
 };

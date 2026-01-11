@@ -63,3 +63,42 @@ export const useReturnBook = () => {
         },
     });
 };
+
+/**
+ * Hook to update loan
+ */
+export const useUpdateLoan = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, data }: { id: string; data: Partial<CreateLoanData> }) =>
+            loansApi.updateLoan(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['loans'] });
+            queryClient.invalidateQueries({ queryKey: ['books'] }); // Refresh books for stock update
+            toast.success('Loan updated successfully!');
+        },
+        onError: (error: Error) => {
+            toast.error(error.message || 'Failed to update loan');
+        },
+    });
+};
+
+/**
+ * Hook to delete loan
+ */
+export const useDeleteLoan = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: string) => loansApi.deleteLoan(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['loans'] });
+            queryClient.invalidateQueries({ queryKey: ['books'] }); // Refresh books in case stock was restored
+            toast.success('Loan deleted successfully!');
+        },
+        onError: (error: Error) => {
+            toast.error(error.message || 'Failed to delete loan');
+        },
+    });
+};
