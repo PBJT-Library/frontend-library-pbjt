@@ -78,6 +78,17 @@ export const ProfileTab: React.FC = () => {
         setIsEditing(false);
     };
 
+    if (isLoading) {
+        return (
+            <Card>
+                <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                    <p className="ml-4 text-slate-600 dark:text-slate-300">Loading profile...</p>
+                </div>
+            </Card>
+        );
+    }
+
     return (
         <Card>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
