@@ -24,13 +24,13 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                         ref={ref}
                         className={cn(
                             'w-full px-4 py-2.5 pr-10 rounded-xl border-2 transition-all duration-200',
-                            'text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-700/50',
+                            'text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800',
                             'focus:outline-none focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-slate-900',
                             'appearance-none cursor-pointer',
                             hasError
                                 ? 'border-error focus:border-error focus:ring-error/20'
-                                : 'border-slate-300 dark:border-slate-500 focus:border-primary-500 dark:focus:border-blue-400 focus:ring-primary-500/20',
-                            'disabled:bg-slate-50 dark:disabled:bg-slate-800 disabled:text-slate-500 dark:disabled:text-slate-600 disabled:cursor-not-allowed disabled:border-slate-200 dark:disabled:border-slate-700',
+                                : 'border-slate-200 dark:border-slate-600 focus:border-primary-500 dark:focus:border-blue-400 focus:ring-primary-500/20',
+                            'disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:text-slate-500 dark:disabled:text-slate-600 disabled:cursor-not-allowed disabled:border-slate-200 dark:disabled:border-slate-700',
                             className
                         )}
                         {...props}
