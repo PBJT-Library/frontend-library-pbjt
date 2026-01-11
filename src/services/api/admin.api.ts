@@ -2,7 +2,11 @@ import apiClient from './client';
 
 export interface UpdateAdminProfileData {
     username?: string;
-    password?: string;
+}
+
+export interface ChangePasswordData {
+    currentPassword: string;
+    newPassword: string;
 }
 
 export const adminApi = {
@@ -15,9 +19,16 @@ export const adminApi = {
     },
 
     /**
-     * PUT /admin/me - Update admin profile (username and/or password)
+     * PUT /admin/me - Update admin profile (username only)
      */
     updateProfile: async (data: UpdateAdminProfileData): Promise<void> => {
         await apiClient.put('/admin/me', data);
+    },
+
+    /**
+     * PUT /admin/password - Change admin password
+     */
+    changePassword: async (data: ChangePasswordData): Promise<void> => {
+        await apiClient.put('/admin/password', data);
     },
 };
