@@ -57,6 +57,7 @@ export const useUpdateBook = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['books'] });
+            queryClient.invalidateQueries({ queryKey: ['loans'] }); // Refresh loans to show updated book titles
             toast.success('Book updated successfully!');
         },
         onError: (error: Error) => {
@@ -75,6 +76,7 @@ export const useDeleteBook = () => {
         mutationFn: (id: string) => booksApi.deleteBook(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['books'] });
+            queryClient.invalidateQueries({ queryKey: ['loans'] }); // Refresh loans in case deleted book had active loans
             toast.success('Book deleted successfully!');
         },
         onError: (error: Error) => {
