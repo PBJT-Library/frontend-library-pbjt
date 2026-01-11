@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'sonner';
-import { Card, Select } from '@/components/ui';
-import { BellIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
-import { useThemeStore } from '@/stores/themeStore';
+import { Card, Select, LoadingSpinner } from '@/components/ui';
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
 interface Preferences {
     itemsPerPage: number;
@@ -10,7 +8,7 @@ interface Preferences {
 }
 
 export const PreferencesTab: React.FC = () => {
-    const { isDarkMode, toggleTheme } = useThemeStore();
+    const [isLoading, setIsLoading] = useState(true);
     const [preferences, setPreferences] = useState<Preferences>({
         itemsPerPage: 10,
         dateFormat: 'DD/MM/YYYY',
@@ -22,53 +20,38 @@ export const PreferencesTab: React.FC = () => {
         if (saved) {
             try {
                 const loaded = JSON.parse(saved);
-                setPreferences(loaded);
+                setPreferences({
+                    itemsPerPage: loaded.itemsPerPage || 10,
+                    dateFormat: loaded.dateFormat || 'DD/MM/YYYY'
+                });
             } catch (error) {
                 console.error('Failed to load preferences');
             }
         }
+        setIsLoading(false);
     }, []);
 
     // Auto-save preferences when they change
     useEffect(() => {
-        localStorage.setItem('userPreferences', JSON.stringify(preferences));
-    }, [preferences]);
+        if (!isLoading) {
+            localStorage.setItem('userPreferences', JSON.stringify(preferences));
+        }
+    }, [preferences, isLoading]);
+
+    if (isLoading) {
+        return (
+            <Card>
+                <div className="flex justify-center items-center py-12">
+                    <LoadingSpinner size="lg" />
+                    <p className="ml-4 text-slate-600 dark:text-slate-300">Loading preferences...</p>
+                </div>
+            </Card>
+        );
+    }
 
     return (
         <Card>
             <div className="space-y-8">
-
-                {/* Notifications Section */}
-                <div>
-                    <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-200 dark:border-slate-600">
-                        <div className="p-3 bg-primary-100 rounded-xl">
-                            <BellIcon className="w-6 h-6 text-primary-600" />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Notifications</h3>
-                            <p className="text-sm text-slate-600 dark:text-slate-300">Manage how you receive notifications</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        {/* Dark Mode Toggle */}
-                        <label className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl transition-colors hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
-                            <div>
-                                <p className="font-medium text-slate-900 dark:text-slate-50">Dark Mode</p>
-                                <p className="text-sm text-slate-600 dark:text-slate-300">Switch between light and dark theme</p>
-                            </div>
-                            <input
-                                type="checkbox"
-                                checked={isDarkMode}
-                                onChange={toggleTheme}
-                                className="w-5 h-5 text-primary-600 rounded focus:ring-2 focus:ring-primary-500"
-                            />
-                        </label>
-
-
-                    </div>
-                </div>
-
                 {/* Display Settings */}
                 <div>
                     <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-200 dark:border-slate-600">
@@ -90,7 +73,6 @@ export const PreferencesTab: React.FC = () => {
                                     ...preferences,
                                     itemsPerPage: Number(e.target.value)
                                 });
-                                toast.success('Preference updated');
                             }}
                             helperText="Number of items to show in tables"
                         >
@@ -108,13 +90,12 @@ export const PreferencesTab: React.FC = () => {
                                     ...preferences,
                                     dateFormat: e.target.value
                                 });
-                                toast.success('Preference updated');
                             }}
                             helperText="How dates are displayed throughout the app"
                         >
                             <option value="DD/MM/YYYY">DD/MM/YYYY (31/12/2024)</option>
                             <option value="MM/DD/YYYY">MM/DD/YYYY (12/31/2024)</option>
-                            <option value="YYYY-MM-DD">YYYY-MM-DD (2024-12-31)</option>
+                            <option value="YYYY/MM/DD">YYYY/MM/DD (2024/12/31)</option>
                         </Select>
                     </div>
                 </div>
