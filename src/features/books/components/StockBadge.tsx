@@ -1,21 +1,43 @@
 import React from 'react';
 import { Badge } from '@/components/ui';
 
-interface StockBadgeProps {
-    stock: number;
+interface StatusBadgeProps {
+    status: 'available' | 'loaned' | 'reserved' | 'maintenance' | 'lost';
 }
 
-export const StockBadge: React.FC<StockBadgeProps> = ({ stock }) => {
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
     const getVariant = () => {
-        if (stock === 0) return 'error';
-        if (stock <= 2) return 'warning';
-        return 'success';
+        switch (status) {
+            case 'available':
+                return 'success';
+            case 'loaned':
+                return 'warning';
+            case 'reserved':
+                return 'info';
+            case 'maintenance':
+                return 'warning';
+            case 'lost':
+                return 'error';
+            default:
+                return 'neutral';
+        }
     };
 
     const getLabel = () => {
-        if (stock === 0) return 'Out of Stock';
-        if (stock <= 2) return `Low Stock (${stock})`;
-        return `${stock} books`;
+        switch (status) {
+            case 'available':
+                return 'Available';
+            case 'loaned':
+                return 'Loaned';
+            case 'reserved':
+                return 'Reserved';
+            case 'maintenance':
+                return 'Maintenance';
+            case 'lost':
+                return 'Lost';
+            default:
+                return status;
+        }
     };
 
     return (
@@ -24,3 +46,6 @@ export const StockBadge: React.FC<StockBadgeProps> = ({ stock }) => {
         </Badge>
     );
 };
+
+// Keep StockBadge as alias for backward compatibility
+export const StockBadge = StatusBadge;
