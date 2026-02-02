@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { BooksTable } from './BooksTable';
 import { BookFormModal } from './BookFormModal';
@@ -6,18 +6,27 @@ import { DeleteBookDialog } from './DeleteBookDialog';
 import { useBooks, useDeleteBook } from '../hooks/useBooks';
 import { Button, Card, Input, Select } from '@/components/ui';
 import type { Book } from '@/types';
-import { ACADEMIC_CATEGORIES, REGULAR_CATEGORIES } from '@/services/constants/categories';
+import type { Category } from '@/types/category';
+import { categoriesApi } from '@/services/api/categories.api';
 import { usePreferences } from '@/hooks/usePreferences';
 
 export const BooksPage: React.FC = () => {
     const { itemsPerPage } = usePreferences();
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState<number | undefined>();
+    const [categories, setCategories] = useState<Category[]>([]);
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingBook, setEditingBook] = useState<Book | undefined>();
     const [deletingBook, setDeletingBook] = useState<Book | undefined>();
+
+    // Fetch categories for filter
+    useEffect(() => {
+        categoriesApi.getCategories()
+            .then(setCategories)
+            .catch(err => console.error('Failed to load categories:', err));
+    }, []);
 
     // Fetch books with React Query
     const { data, isLoading, isError } = useBooks({
@@ -25,7 +34,7 @@ export const BooksPage: React.FC = () => {
         limit: itemsPerPage,
         filters: {
             search,
-            category: categoryFilter || undefined,
+            category_id: categoryFilter,
         },
         sortBy: 'title',
         sortOrder: 'asc',
@@ -44,7 +53,7 @@ export const BooksPage: React.FC = () => {
 
     const confirmDelete = async () => {
         if (deletingBook) {
-            await deleteMutation.mutateAsync(deletingBook.id);
+            await deleteMutation.mutateAsync(deletingBook.book_id);
             setDeletingBook(undefined);
         }
     };
@@ -89,26 +98,22 @@ export const BooksPage: React.FC = () => {
                         />
                     </div>
 
-                    {/* Category Filter */}
+                    {/* Category Filter - Now dynamic from API */}
                     <div>
                         <Select
-                            value={categoryFilter}
+                            value={categoryFilter || ''}
                             onChange={(e) => {
-                                setCategoryFilter(e.target.value);
+                                const value = e.target.value;
+                                setCategoryFilter(value ? parseInt(value) : undefined);
                                 setPage(1);
                             }}
                         >
                             <option value="">All Categories</option>
-                            <optgroup label="📚 Academic Works">
-                                {ACADEMIC_CATEGORIES.map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </optgroup>
-                            <optgroup label="📖 Regular Books">
-                                {REGULAR_CATEGORIES.map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </optgroup>
+                            {categories.map(cat => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.code} - {cat.name}
+                                </option>
+                            ))}
                         </Select>
                     </div>
                 </div>

@@ -73,8 +73,8 @@ export const Dashboard: React.FC = () => {
     // Calculate KPIs
     const totalBooks = books.length;
     const totalMembers = members.length;
-    const activeLoans = allLoans.filter(loan => !loan.return_date).length;
-    const returnedLoans = allLoans.filter(loan => loan.return_date).length;
+    const activeLoans = allLoans.filter(loan => loan.status === 'active').length;
+    const returnedLoans = allLoans.filter(loan => loan.status === 'completed').length;
 
     return (
         <div className="space-y-6">
@@ -128,8 +128,8 @@ export const Dashboard: React.FC = () => {
                         onClick={() => navigate('/books')}
                         className="group flex items-center justify-center gap-3 px-6 py-4 bg-white dark:bg-slate-800 border-2 border-primary-200 dark:border-primary-700 text-primary-700 dark:text-blue-300 rounded-2xl hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-200 shadow-soft hover:shadow-card"
                     >
-                        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-blue-300 group-hover:bg-primary-200 dark:group-hover:bg-primary-800/50 transition-colors">
-                            <PlusIcon className="w-5 h-5" />
+                        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-blue-300 group-hover:bg-primary-600 dark:group-hover:bg-blue-500 transition-colors group-hover:text-white">
+                            <PlusIcon className="w-5 h-5 stroke-2" />
                         </div>
                         <span className="font-medium">Add New Book</span>
                     </button>
@@ -138,7 +138,7 @@ export const Dashboard: React.FC = () => {
                         className="group flex items-center justify-center gap-3 px-6 py-4 bg-white dark:bg-slate-800 border-2 border-success-light dark:border-success text-success-dark dark:text-success-light rounded-2xl hover:bg-success-light/30 dark:hover:bg-success/20 hover:border-success transition-all duration-200 shadow-soft hover:shadow-card"
                     >
                         <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-success-light dark:bg-success/20 text-success-dark dark:text-success-light group-hover:bg-success transition-colors group-hover:text-white">
-                            <PlusIcon className="w-5 h-5" />
+                            <PlusIcon className="w-5 h-5 stroke-2" />
                         </div>
                         <span className="font-medium">Register Member</span>
                     </button>
@@ -147,7 +147,7 @@ export const Dashboard: React.FC = () => {
                         className="group flex items-center justify-center gap-3 px-6 py-4 bg-white dark:bg-slate-800 border-2 border-warning-light dark:border-warning text-warning-dark dark:text-warning-light rounded-2xl hover:bg-warning-light/30 dark:hover:bg-warning/20 hover:border-warning transition-all duration-200 shadow-soft hover:shadow-card"
                     >
                         <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-warning-light dark:bg-warning/20 text-warning-dark dark:text-warning-light group-hover:bg-warning transition-colors group-hover:text-white">
-                            <PlusIcon className="w-5 h-5" />
+                            <PlusIcon className="w-5 h-5 stroke-2" />
                         </div>
                         <span className="font-medium">New Loan</span>
                     </button>
@@ -202,7 +202,7 @@ export const Dashboard: React.FC = () => {
                                     {recentLoans.map((loan) => (
                                         <tr key={loan.id} className="hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors">
                                             <td className="px-4 py-3 text-sm font-mono text-slate-900 dark:text-slate-200">
-                                                {loan.uuid}
+                                                {loan.loan_id}
                                             </td>
                                             <td className="px-4 py-3 text-sm text-slate-900 dark:text-slate-200">
                                                 {loan.member_name}
@@ -214,8 +214,8 @@ export const Dashboard: React.FC = () => {
                                                 {formatDate(loan.loan_date, dateFormat)}
                                             </td>
                                             <td className="px-4 py-3">
-                                                <Badge variant={!loan.return_date ? 'warning' : 'success'} size="sm">
-                                                    {!loan.return_date ? 'Active' : 'Returned'}
+                                                <Badge variant={loan.status === 'active' ? 'warning' : 'success'} size="sm">
+                                                    {loan.status === 'active' ? 'Active' : 'Returned'}
                                                 </Badge>
                                             </td>
                                         </tr>

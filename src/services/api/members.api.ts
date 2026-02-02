@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { type Member } from '../../types';
+import { type Member, type CreateMemberDTO, type UpdateMemberDTO } from '../../types';
 import { paginate, type PaginationParams, type PaginatedResponse } from '../utils/pagination';
 import { sortData } from '../utils/filter';
 
@@ -20,22 +20,27 @@ export const membersApi = {
      */
     getMembers: async (params: MembersParams): Promise<PaginatedResponse<Member>> => {
         try {
-            const response = await apiClient.get<Member[]>('/members');
-            let members = response.data;
+            let members: Member[];
 
-            // Apply client-side filters
-            if (params.filters) {
-                const { search, study_program } = params.filters;
+            // If search query exists, use search endpoint for server-side filtering
+            if (params.filters?.search && params.filters.search.trim().length > 0) {
+                console.log('[API] Using search endpoint with query:', params.filters.search);
+                const response = await apiClient.get<Member[]>(`/members/search?q=${encodeURIComponent(params.filters.search)}`);
+                members = response.data;
 
-                if (search) {
-                    members = members.filter(member =>
-                        member.name.toLowerCase().includes(search.toLowerCase()) ||
-                        member.id.includes(search)
-                    );
+                // Apply additional client-side filters if needed
+                if (params.filters?.study_program) {
+                    members = members.filter(member => member.study_program === params.filters?.study_program);
                 }
+            } else {
+                // No search query, use regular endpoint
+                console.log('[API] Using regular members endpoint');
+                const response = await apiClient.get<Member[]>('/members');
+                members = response.data;
 
-                if (study_program) {
-                    members = members.filter(member => member.study_program === study_program);
+                // Apply client-side filters
+                if (params.filters?.study_program) {
+                    members = members.filter(member => member.study_program === params.filters?.study_program);
                 }
             }
 
@@ -68,14 +73,14 @@ export const membersApi = {
     /**
      * POST /members - Create new member
      */
-    createMember: async (data: Member): Promise<void> => {
+    createMember: async (data: CreateMemberDTO): Promise<void> => {
         await apiClient.post('/members', data);
     },
 
     /**
      * PUT /members/:id - Update member
      */
-    updateMember: async (id: string, data: Partial<Member>): Promise<void> => {
+    updateMember: async (id: string, data: UpdateMemberDTO): Promise<void> => {
         await apiClient.put(`/members/${id}`, data);
     },
 

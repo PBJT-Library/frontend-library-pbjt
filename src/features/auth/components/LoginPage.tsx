@@ -40,20 +40,27 @@ export const LoginPage: React.FC = () => {
             await login(data.username, data.password);
             toast.success('Selamat datang kembali!');
             navigate('/dashboard');
-        } catch (error) {
-            const errorMessage = (error as Error).message;
+        } catch (error: any) {
+            const errorMessage = error.message || '';
+            const errorStatus = error.status; // Use error.status from enhanced error
 
-            // Check if error is about user not found
-            if (errorMessage.includes('not found') || errorMessage.includes('tidak ditemukan')) {
-                toast.error('User tidak ditemukan. Silakan registrasi akun terlebih dahulu.', {
+            // Check for 404: Account not found
+            if (errorStatus === 404 || errorMessage.includes('tidak ditemukan')) {
+                toast.error('Akun tidak ditemukan. Silakan registrasi terlebih dahulu.', {
                     duration: 5000,
                     action: {
                         label: 'Register',
                         onClick: () => navigate('/register')
                     }
                 });
-            } else {
-                toast.error(errorMessage || 'Username atau password salah. Silakan coba lagi.');
+            }
+            // Check for 401: Wrong password
+            else if (errorStatus === 401 || errorMessage.includes('Password salah')) {
+                toast.error('Password salah. Silakan coba lagi.');
+            }
+            // Generic fallback
+            else {
+                toast.error(errorMessage || 'Login gagal. Silakan coba lagi.');
             }
         }
     };
@@ -175,24 +182,26 @@ export const LoginPage: React.FC = () => {
                                                         bg-slate-50 border-2 ${errors.password ? 'border-red-500' : 'border-slate-200'}
                                                         rounded-xl 
                                                         text-slate-900 placeholder-slate-400
+                                                        font-thin tracking-wider
                                                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white
                                                         transition-all duration-300 ease-in-out
                                                         hover:border-slate-300 hover:bg-white hover:shadow-sm
                                                         disabled:opacity-50 disabled:cursor-not-allowed
+                                                        [&::-ms-reveal]:hidden [&::-ms-clear]:hidden
                                                     `}
                                                     placeholder="••••••••"
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() => setShowPassword(!showPassword)}
-                                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-all duration-200 hover:scale-110"
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-all duration-200"
                                                     disabled={isSubmitting}
                                                     tabIndex={-1}
                                                 >
                                                     {showPassword ? (
-                                                        <EyeSlashIcon className="w-5 h-5" />
+                                                        <EyeSlashIcon className="w-5 h-5 stroke-[1.5]" />
                                                     ) : (
-                                                        <EyeIcon className="w-5 h-5" />
+                                                        <EyeIcon className="w-5 h-5 stroke-[1.5]" />
                                                     )}
                                                 </button>
                                             </div>

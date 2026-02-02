@@ -9,6 +9,7 @@ import { Dashboard } from './features/dashboard/components/Dashboard';
 import { BooksPage } from './features/books/components/BooksPage';
 import { MembersPage } from './features/members/components/MembersPage';
 import { LoansPage } from './features/loans/components/LoansPage';
+import { CategoriesPage } from './features/categories/components/CategoriesPage';
 import { SettingsPage } from './features/settings/components/SettingsPage';
 import { useAuthStore } from './features/auth/store/authStore';
 
@@ -82,6 +83,9 @@ const App: React.FC = () => {
 
             {/* Loans Module */}
             <Route path="loans" element={<LoansPage />} />
+
+            {/* Categories Module */}
+            <Route path="categories" element={<CategoriesPage />} />
 
             {/* Settings */}
             <Route path="settings" element={<SettingsPage />} />

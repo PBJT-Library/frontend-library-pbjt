@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { bookSchema, type BookFormData } from '../schemas/bookSchema';
 import { useCreateBook, useUpdateBook } from '../hooks/useBooks';
 import { Input, Select, Modal, ModalFooter, Button } from '@/components/ui';
 import type { Book } from '@/types';
-import { ACADEMIC_CATEGORIES, REGULAR_CATEGORIES } from '@/services/constants/categories';
+import type { Category } from '@/types/category';
+import { categoriesApi } from '@/services/api/categories.api';
 
 interface BookFormModalProps {
     isOpen: boolean;
@@ -21,6 +22,8 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
     const isEditMode = !!book;
     const createMutation = useCreateBook();
     const updateMutation = useUpdateBook();
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loadingCategories, setLoadingCategories] = useState(false);
 
     const {
         register,
@@ -30,61 +33,86 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
     } = useForm<BookFormData>({
         resolver: zodResolver(bookSchema),
         defaultValues: book ? {
-            id: book.id,
             title: book.title,
-            category: book.category,
-            author: book.author,
-            publisher: book.publisher,
-            year: book.year,
-            stock: book.stock,
+            category_id: book.category_id,
+            author: book.author || '',
+            publisher: book.publisher || '',
+            publication_year: book.publication_year || new Date().getFullYear(),
+            quantity: 1, // Not editable in edit mode
         } : {
-            id: '',
             title: '',
             author: '',
             publisher: '',
-            year: new Date().getFullYear(),
-            stock: 1,
-            category: 'Programming',
+            publication_year: new Date().getFullYear(),
+            quantity: 1,
+            category_id: 0,
         },
     });
+
+    // Fetch categories when modal opens
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                setLoadingCategories(true);
+                const data = await categoriesApi.getCategories();
+                setCategories(data);
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            } finally {
+                setLoadingCategories(false);
+            }
+        };
+
+        if (isOpen) {
+            fetchCategories();
+        }
+    }, [isOpen]);
 
     // Reset form when modal opens/closes
     useEffect(() => {
         if (isOpen) {
             if (book) {
                 reset({
-                    id: book.id,
                     title: book.title,
-                    category: book.category,
-                    author: book.author,
-                    publisher: book.publisher,
-                    year: book.year,
-                    stock: book.stock,
+                    category_id: book.category_id,
+                    author: book.author || '',
+                    publisher: book.publisher || '',
+                    publication_year: book.publication_year || new Date().getFullYear(),
+                    quantity: 1,
                 });
             } else {
                 reset({
-                    id: '',
                     title: '',
-                    category: 'Programming',
+                    category_id: categories[0]?.id || 0,
                     author: '',
                     publisher: '',
-                    year: new Date().getFullYear(),
-                    stock: 1,
+                    publication_year: new Date().getFullYear(),
+                    quantity: 1,
                 });
             }
         }
-    }, [isOpen, book, reset]);
+    }, [isOpen, book, reset, categories]);
+
 
     const onSubmit = async (data: BookFormData) => {
         try {
             if (isEditMode) {
-                await updateMutation.mutateAsync({ id: book.id, data });
+                // When editing, don't send quantity
+                const { quantity, ...updateData } = data;
+                await updateMutation.mutateAsync({ book_id: book.book_id, data: updateData });
             } else {
                 await createMutation.mutateAsync(data);
             }
-            onClose();
+            // Small delay to allow toast notification to appear before modal closes
+            // Use a ref or cleanup to avoid state updates on unmounted component
+            setTimeout(() => {
+                onClose();
+            }, 300);
+
+            // Store timeout ID to clear if component unmounts
         } catch (error) {
             // Error handled by mutation
+            console.error('Book form submission error:', error);
         }
     };
 
@@ -97,19 +125,6 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
         >
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid grid-cols-2 gap-4">
-                    {/* Book ID - Only show in create mode */}
-                    {!isEditMode && (
-                        <div className="col-span-2">
-                            <Input
-                                label="Book ID"
-                                {...register('id')}
-                                error={errors.id?.message}
-                                placeholder="e.g., BK001, BK002"
-                                helperText="Unique identifier for the book (e.g., BK001)"
-                            />
-                        </div>
-                    )}
-
                     {/* Title */}
                     <div className="col-span-2">
                         <Input
@@ -130,27 +145,28 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                         />
                     </div>
 
-                    {/* Category */}
+                    {/* Category - Dropdown by ID */}
                     <div className="col-span-2">
                         <Select
                             label="Category"
-                            {...register('category')}
-                            error={errors.category?.message as string}
+                            {...register('category_id', { valueAsNumber: true })}
+                            error={errors.category_id?.message as string}
+                            disabled={loadingCategories}
                         >
-                            <optgroup label="📚 Academic Works">
-                                {ACADEMIC_CATEGORIES.map(cat => (
-                                    <option key={cat} value={cat}>
-                                        {cat}
-                                    </option>
-                                ))}
-                            </optgroup>
-                            <optgroup label="📖 Regular Books">
-                                {REGULAR_CATEGORIES.map(cat => (
-                                    <option key={cat} value={cat}>
-                                        {cat}
-                                    </option>
-                                ))}
-                            </optgroup>
+                            {loadingCategories ? (
+                                <option value={0}>Loading categories...</option>
+                            ) : categories.length === 0 ? (
+                                <option value={0}>No categories available</option>
+                            ) : (
+                                <>
+                                    <option value={0}>Select a category</option>
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.code} - {cat.name}
+                                        </option>
+                                    ))}
+                                </>
+                            )}
                         </Select>
                     </div>
 
@@ -167,24 +183,27 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                     {/* Year */}
                     <div>
                         <Input
-                            label="Year"
+                            label="Publication Year"
                             type="number"
-                            {...register('year', { valueAsNumber: true })}
-                            error={errors.year?.message}
+                            {...register('publication_year', { valueAsNumber: true })}
+                            error={errors.publication_year?.message}
                             placeholder="2024"
                         />
                     </div>
 
-                    {/* Stock */}
-                    <div className="col-span-2">
-                        <Input
-                            label="Stock"
-                            type="number"
-                            {...register('stock', { valueAsNumber: true })}
-                            error={errors.stock?.message}
-                            placeholder="0"
-                        />
-                    </div>
+                    {/* Quantity - Only show in create mode */}
+                    {!isEditMode && (
+                        <div className="col-span-2">
+                            <Input
+                                label="Quantity"
+                                type="number"
+                                {...register('quantity', { valueAsNumber: true })}
+                                error={errors.quantity?.message}
+                                placeholder="Number of copies"
+                                helperText="Number of physical book copies to add. Each will get a unique book_id."
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Actions */}

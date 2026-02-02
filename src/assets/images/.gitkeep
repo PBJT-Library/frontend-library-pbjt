@@ -1,0 +1,12 @@
+# Images
+
+Place your logo and image assets here.
+
+## Quick Reference
+
+- `logo.png` - Primary logo
+- `logo-dark.png` - Dark mode variant
+- `logo-light.png` - Light mode variant
+- `logo-icon.png` - Icon only (square)
+
+Run images through compression tools before adding to repo.

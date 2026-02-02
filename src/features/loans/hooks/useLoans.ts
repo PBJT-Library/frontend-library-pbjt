@@ -37,7 +37,7 @@ export const useCreateLoan = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['loans'] });
             queryClient.invalidateQueries({ queryKey: ['books'] }); // Refresh books for stock update
-            toast.success('Book borrowed successfully!');
+            // Notification handled by LoanFormModal
         },
         onError: (error: Error) => {
             toast.error(error.message || 'Failed to borrow book');

@@ -6,3 +6,6 @@ export { LoadingSpinner } from './LoadingSpinner';
 export { Badge } from './Badge';
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './Table';
 export { Modal, ModalFooter } from './Modal';
+export { ConfirmationModal } from './ConfirmationModal';
+export { BookSearchSelect } from './BookSearchSelect';
+export { Logo, LibraryLogo, InstitutionalLogo, DualLogo } from './Logo';

@@ -56,9 +56,17 @@ apiClient.interceptors.response.use(
 
         // Handle authentication errors
         if (status === 401) {
-            localStorage.removeItem('auth_token');
-            window.location.href = '/login';
-            message = 'Session expired - please login again';
+            // Don't redirect if this is a login attempt (wrong credentials)
+            // Only redirect if user is already logged in and session expired
+            const isLoginEndpoint = error.config?.url?.includes('/login');
+
+            if (!isLoginEndpoint) {
+                // Session expired for authenticated user
+                localStorage.removeItem('auth_token');
+                window.location.href = '/login';
+                message = 'Session expired - please login again';
+            }
+            // For login endpoint, keep the backend message (already set above)
         }
 
         // Create enhanced error with extracted message

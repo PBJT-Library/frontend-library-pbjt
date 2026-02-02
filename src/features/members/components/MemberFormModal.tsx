@@ -28,15 +28,18 @@ export const MemberFormModal: React.FC<MemberFormModalProps> = ({
         reset,
     } = useForm<MemberFormData>({
         resolver: zodResolver(memberSchema),
-        defaultValues: member || {
-            semester: 1,
-        },
     });
 
     useEffect(() => {
         if (isOpen) {
             if (member) {
-                reset(member);
+                // Map Member type to MemberFormData
+                reset({
+                    id: member.member_id,      // Use member_id (NIM) not id (internal)
+                    name: member.name,
+                    study_program: member.study_program || '',
+                    semester: member.semester,
+                });
             } else {
                 reset({
                     id: '',
@@ -51,11 +54,17 @@ export const MemberFormModal: React.FC<MemberFormModalProps> = ({
     const onSubmit = async (data: MemberFormData) => {
         try {
             if (isEditMode) {
-                await updateMutation.mutateAsync({ id: member.id, data });
+                await updateMutation.mutateAsync({
+                    id: member.member_id,
+                    data,
+                });
             } else {
                 await createMutation.mutateAsync(data);
             }
-            onClose();
+            // Small delay to allow toast notification to appear before modal closes
+            setTimeout(() => {
+                onClose();
+            }, 300);
         } catch (error) {
             // Error handled by mutation
         }

@@ -32,7 +32,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                             'w-full px-4 py-2.5 rounded-xl border-2 transition-all duration-200',
                             'text-slate-900 dark:text-slate-100',
                             'bg-white dark:bg-slate-800',
-                            'placeholder:text-slate-500 dark:placeholder:text-slate-500',
+                            'placeholder:text-slate-400 dark:placeholder:text-slate-400',
                             'focus:outline-none focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-slate-900',
                             hasError
                                 ? 'border-error focus:border-error focus:ring-error/20'
@@ -40,6 +40,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                             'disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:text-slate-500 dark:disabled:text-slate-600 disabled:cursor-not-allowed disabled:border-slate-200 dark:disabled:border-slate-700',
                             leftIcon ? 'pl-10' : '',
                             rightIcon ? 'pr-10' : '',
+                            props.type === 'password' ? 'font-thin tracking-wider' : '',
                             className
                         )}
                         {...props}
@@ -54,7 +55,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     <p className="mt-1.5 text-sm text-error">{error}</p>
                 )}
                 {helperText && !error && (
-                    <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-300">{helperText}</p>
+                    <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">{helperText}</p>
                 )}
             </div>
         );

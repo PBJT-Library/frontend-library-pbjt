@@ -29,6 +29,6 @@ export const adminApi = {
      * PUT /admin/password - Change admin password
      */
     changePassword: async (data: ChangePasswordData): Promise<void> => {
-        await apiClient.put('/admin/password', data);
+        await apiClient.put('/admin/me/pass', data);
     },
 };

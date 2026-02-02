@@ -1,33 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { PlusIcon } from '@heroicons/react/24/outline';
-import { toast } from 'sonner';
+
 import { LoansTable } from './LoansTable';
 import { LoanFormModal } from './LoanFormModal';
 import { EditLoanModal } from './EditLoanModal';
 import { useLoans, useReturnBook, useUpdateLoan, useDeleteLoan } from '../hooks/useLoans';
-import { Button, Card } from '@/components/ui';
+import { Button, Card, ConfirmationModal } from '@/components/ui';
 import type { Loan } from '@/types';
 import { usePreferences } from '@/hooks/usePreferences';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL;
+
 
 export const LoansPage: React.FC = () => {
     const { itemsPerPage } = usePreferences();
     const [page, setPage] = useState(1);
-    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'returned'>('all');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed' | 'overdue'>('all');
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
 
-    const [books, setBooks] = useState([]);
-    const [members, setMembers] = useState([]);
+    // Confirmation modal states
+    const [confirmAction, setConfirmAction] = useState<{
+        isOpen: boolean;
+        type: 'return' | 'bulk-return' | 'delete' | 'bulk-delete' | null;
+        loan?: Loan | null;
+        loanIds?: string[];
+        loans?: Loan[];
+    }>({ isOpen: false, type: null, loan: null });
+
+
 
     const { data, isLoading, isError } = useLoans({
         page,
         limit: itemsPerPage,
         filters: {
-            returned: statusFilter === 'all' ? undefined : statusFilter === 'returned',
+            status: statusFilter === 'all' ? undefined : statusFilter,
         },
         sortBy: 'loan_date',
         sortOrder: 'desc',
@@ -37,68 +45,16 @@ export const LoansPage: React.FC = () => {
     const updateMutation = useUpdateLoan();
     const deleteMutation = useDeleteLoan();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            console.log('=== START FETCHING ===');
-            console.log('API_URL:', API_URL);
-
-            try {
-                // Fetch books
-                console.log('Fetching books from:', `${API_URL}/books`);
-                const bookRes = await fetch(`${API_URL}/books`);
-                console.log('Books response status:', bookRes.status, bookRes.ok);
-
-                // Fetch members
-                console.log('Fetching members from:', `${API_URL}/members`);
-                const memberRes = await fetch(`${API_URL}/members`);
-                console.log('Members response status:', memberRes.status, memberRes.ok);
-
-                if (!bookRes.ok || !memberRes.ok) {
-                    throw new Error(`Failed: Books ${bookRes.status}, Members ${memberRes.status}`);
-                }
-
-                // Parse JSON
-                console.log('Parsing books JSON...');
-                const booksData = await bookRes.json();
-                console.log('Books data:', booksData);
-
-                console.log('Parsing members JSON...');
-                const membersData = await memberRes.json();
-                console.log('Members data:', membersData);
-
-                // ✅ Handle both formats: array atau { data: array }
-                const booksArray = Array.isArray(booksData) ? booksData : (booksData?.data || []);
-                const membersArray = Array.isArray(membersData) ? membersData : (membersData?.data || []);
-
-                console.log('Setting books state:', booksArray.length, 'items');
-                console.log('Setting members state:', membersArray.length, 'items');
-
-                setBooks(booksArray);
-                setMembers(membersArray);
-
-                console.log('=== FETCH SUCCESS ===');
-            } catch (error) {
-                console.error('=== FETCH FAILED ===');
-                console.error('Error type:', error instanceof TypeError ? 'TypeError (network)' : 'Other');
-                console.error('Error message:', (error as Error).message);
-                console.error('Full error:', error);
-
-                toast.error('Failed to load data from backend');
-
-                // ✅ Set empty array untuk prevent loading forever
-                setBooks([]);
-                setMembers([]);
-            }
-        };
-
-        fetchData();
-    }, []);
 
     const handleReturn = async (loan: Loan) => {
-        if (window.confirm(`Kembalikan buku "${loan.book_title}"?`)) {
-            await returnMutation.mutateAsync(loan.id);
-        }
+        setConfirmAction({ isOpen: true, type: 'return', loan });
     };
+
+    const handleBulkReturn = (loanIds: string[]) => {
+        setConfirmAction({ isOpen: true, type: 'bulk-return', loan: null, loanIds });
+    };
+
+    // handleReturnAll removed - bulk operations handled by LoansTable internally
 
     const handleEdit = (loan: Loan) => {
         setSelectedLoan(loan);
@@ -108,10 +64,8 @@ export const LoansPage: React.FC = () => {
     const handleSaveEdit = async (
         loanId: string,
         data: {
-            book_id: string;
-            member_id: string;
-            loan_date: string;
-            quantity: number
+            book_id?: number;
+            due_date?: string;
         }
     ) => {
         await updateMutation.mutateAsync({ id: loanId, data });
@@ -120,9 +74,46 @@ export const LoansPage: React.FC = () => {
     };
 
     const handleDelete = async (loan: Loan) => {
-        if (window.confirm(`Hapus data peminjaman buku "${loan.book_title}" oleh ${loan.member_name}?\n\nData yang sudah dihapus tidak dapat dikembalikan.`)) {
-            await deleteMutation.mutateAsync(loan.id);
+        setConfirmAction({ isOpen: true, type: 'delete', loan, loans: [loan] });
+    };
+
+    const handleBulkDelete = (loanIds: string[]) => {
+        // Get loan objects for display in confirmation
+        const loansToDelete = loans.filter(loan => loanIds.includes(loan.loan_id));
+        setConfirmAction({
+            isOpen: true,
+            type: 'bulk-delete',
+            loanIds,
+            loans: loansToDelete,
+        });
+    };
+
+    const handleConfirmAction = async () => {
+        if (confirmAction.type === 'return' && confirmAction.loan) {
+            await returnMutation.mutateAsync(confirmAction.loan.loan_id);
+        } else if (confirmAction.type === 'delete' && confirmAction.loan) {
+            await deleteMutation.mutateAsync(confirmAction.loan.loan_id);
+        } else if (confirmAction.type === 'bulk-return' && confirmAction.loanIds) {
+            // Return loans sequentially to avoid race conditions
+            for (const loanId of confirmAction.loanIds) {
+                try {
+                    await returnMutation.mutateAsync(loanId);
+                } catch (error) {
+                    console.error(`Failed to return loan ${loanId}:`, error);
+                }
+            }
+        } else if (confirmAction.type === 'bulk-delete' && confirmAction.loanIds) {
+            // Delete loans sequentially
+            for (const loanId of confirmAction.loanIds) {
+                try {
+                    await deleteMutation.mutateAsync(loanId);
+                } catch (error) {
+                    console.error(`Failed to delete loan ${loanId}:`, error);
+                }
+            }
         }
+
+        setConfirmAction({ isOpen: false, type: null, loan: null });
     };
 
     const loans = data?.data || [];
@@ -171,13 +162,23 @@ export const LoansPage: React.FC = () => {
                         </Button>
                         <Button
                             size="sm"
-                            variant={statusFilter === 'returned' ? 'primary' : 'secondary'}
+                            variant={statusFilter === 'completed' ? 'primary' : 'secondary'}
                             onClick={() => {
-                                setStatusFilter('returned');
+                                setStatusFilter('completed');
                                 setPage(1);
                             }}
                         >
                             Returned
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant={statusFilter === 'overdue' ? 'primary' : 'secondary'}
+                            onClick={() => {
+                                setStatusFilter('overdue');
+                                setPage(1);
+                            }}
+                        >
+                            Overdue
                         </Button>
                     </div>
                 </div>
@@ -196,8 +197,10 @@ export const LoansPage: React.FC = () => {
                 loans={loans}
                 isLoading={isLoading}
                 onReturn={handleReturn}
+                onBulkReturn={handleBulkReturn}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onBulkDelete={handleBulkDelete}
             />
 
             {/* Pagination */}
@@ -245,8 +248,66 @@ export const LoansPage: React.FC = () => {
                     setSelectedLoan(null);
                 }}
                 onSave={handleSaveEdit}
-                books={books}
-                members={members}
+            />
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={confirmAction.isOpen}
+                onClose={() => setConfirmAction({ isOpen: false, type: null, loan: null })}
+                onConfirm={handleConfirmAction}
+                title={
+                    confirmAction.type === 'return'
+                        ? 'Kembalikan Buku'
+                        : confirmAction.type === 'bulk-return'
+                            ? 'Kembalikan Banyak Buku'
+                            : confirmAction.type === 'bulk-delete'
+                                ? `Hapus ${confirmAction.loans?.length || 0} Peminjaman`
+                                : 'Hapus Data Peminjaman'
+                }
+                message={
+                    confirmAction.type === 'return'
+                        ? `Apakah Anda yakin ingin mengembalikan buku dari peminjaman ${confirmAction.loan?.loan_id}?`
+                        : confirmAction.type === 'bulk-return'
+                            ? `Apakah Anda yakin ingin mengembalikan ${confirmAction.loanIds?.length || 0} buku yang dipilih?`
+                            : confirmAction.type === 'bulk-delete' && confirmAction.loans
+                                ? (
+                                    <div className="space-y-3">
+                                        <p className="text-slate-700 dark:text-slate-300">
+                                            Ini akan menghapus <strong>{confirmAction.loans.length} peminjaman</strong> yang sudah dikembalikan:
+                                        </p>
+                                        <div className="max-h-48 overflow-y-auto bg-slate-50 dark:bg-slate-800 rounded-lg p-4 space-y-2 border border-slate-200 dark:border-slate-700">
+                                            {confirmAction.loans.map((loan) => (
+                                                <div key={loan.id} className="flex items-start gap-2 text-sm">
+                                                    <span className="text-slate-500 dark:text-slate-400">•</span>
+                                                    <div className="flex-1">
+                                                        <span className="font-mono font-semibold text-slate-900 dark:text-slate-100">{loan.loan_id}</span>
+                                                        {' - '}
+                                                        <span className="text-slate-700 dark:text-slate-300">{loan.member_name}</span>
+                                                        {' - '}
+                                                        <span className="text-slate-600 dark:text-slate-400 italic">"{loan.book_title}"</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <p className="text-sm text-red-600 dark:text-red-400">
+                                            ⚠️ Semua peminjaman sudah dikembalikan. Aksi ini tidak dapat dibatalkan.
+                                        </p>
+                                    </div>
+                                )
+                                : `Apakah Anda yakin ingin menghapus data peminjaman buku oleh ${confirmAction.loan?.member_name}? Data yang sudah dihapus tidak dapat dikembalikan.`
+                }
+                confirmText={
+                    confirmAction.type === 'return'
+                        ? 'Ya, Kembalikan'
+                        : confirmAction.type === 'bulk-return'
+                            ? 'Ya, Kembalikan Semua'
+                            : confirmAction.type === 'bulk-delete'
+                                ? `Ya, Hapus ${confirmAction.loans?.length || 0} Peminjaman`
+                                : 'Ya, Hapus'
+                }
+                cancelText="Batal"
+                variant="destructive"
+                isLoading={returnMutation.isPending || deleteMutation.isPending}
             />
         </div>
     );

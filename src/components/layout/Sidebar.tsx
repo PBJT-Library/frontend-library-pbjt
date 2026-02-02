@@ -5,10 +5,12 @@ import {
     BookOpenIcon,
     UsersIcon,
     ClipboardDocumentListIcon,
+    FolderIcon,
     ArrowRightOnRectangleIcon,
     Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { Logo } from '@/components/ui';
 
 interface NavItem {
     name: string;
@@ -21,6 +23,7 @@ const navItems: NavItem[] = [
     { name: 'Books', path: '/books', icon: BookOpenIcon },
     { name: 'Members', path: '/members', icon: UsersIcon },
     { name: 'Loans', path: '/loans', icon: ClipboardDocumentListIcon },
+    { name: 'Categories', path: '/categories', icon: FolderIcon },
 ];
 
 export const Sidebar: React.FC = () => {
@@ -35,19 +38,17 @@ export const Sidebar: React.FC = () => {
 
     return (
         <div className="h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-sm transition-colors duration-200">
-            {/* Logo */}
+            {/* Logo - Dual Branding */}
             <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-600 to-primary-700 flex items-center justify-center shadow-soft">
-                        <BookOpenIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
-                            Library
-                        </h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-300">Management System</p>
-                    </div>
-                </div>
+                <Logo
+                    type="both"
+                    size="md"
+                    withText
+                    text={{
+                        primary: 'Perpustakaan PBJT',
+                        secondary: 'Library System'
+                    }}
+                />
             </div>
 
             {/* Navigation */}

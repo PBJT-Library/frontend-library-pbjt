@@ -1,7 +1,7 @@
 import React from 'react';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { Book } from '@/types';
-import { StockBadge } from './StockBadge';
+import { StatusBadge } from './StockBadge';
 import { LoadingSpinner, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui';
 
 interface BooksTableProps {
@@ -40,20 +40,20 @@ export const BooksTable: React.FC<BooksTableProps> = ({
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead>ID</TableHead>
+                    <TableHead>Book ID</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Author</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Year</TableHead>
-                    <TableHead>Stock</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {books.map((book) => (
-                    <TableRow key={book.id}>
+                    <TableRow key={book.uuid}>
                         <TableCell>
-                            <div className="font-mono text-xs text-slate-600 dark:text-slate-400">{book.id}</div>
+                            <div className="font-mono text-xs text-slate-600 dark:text-slate-400">{book.book_id}</div>
                         </TableCell>
                         <TableCell>
                             <div className="font-medium text-slate-900 dark:text-slate-50">{book.title}</div>
@@ -64,14 +64,14 @@ export const BooksTable: React.FC<BooksTableProps> = ({
                         </TableCell>
                         <TableCell>
                             <Badge variant="primary" size="sm">
-                                {book.category}
+                                {book.category_name || book.category_code}
                             </Badge>
                         </TableCell>
                         <TableCell>
-                            <div className="text-slate-600 dark:text-slate-300">{book.year}</div>
+                            <div className="text-slate-600 dark:text-slate-300">{book.publication_year}</div>
                         </TableCell>
                         <TableCell>
-                            <StockBadge stock={book.stock} />
+                            <StatusBadge status={book.status} />
                         </TableCell>
                         <TableCell>
                             <div className="flex justify-end gap-2">

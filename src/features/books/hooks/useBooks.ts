@@ -15,13 +15,13 @@ export const useBooks = (params: BooksParams) => {
 };
 
 /**
- * Hook to fetch single book
+ * Hook to fetch single book by book_id
  */
-export const useBook = (id: string) => {
+export const useBook = (book_id: string) => {
     return useQuery({
-        queryKey: ['book', id],
-        queryFn: () => booksApi.getBook(id),
-        enabled: !!id,
+        queryKey: ['book', book_id],
+        queryFn: () => booksApi.getBook(book_id),
+        enabled: !!book_id,
     });
 };
 
@@ -52,12 +52,12 @@ export const useUpdateBook = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id, data }: { id: string; data: Partial<BookFormData> }) => {
-            return booksApi.updateBook(id, data);
+        mutationFn: ({ book_id, data }: { book_id: string; data: Partial<BookFormData> }) => {
+            return booksApi.updateBook(book_id, data);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['books'] });
-            queryClient.invalidateQueries({ queryKey: ['loans'] }); // Refresh loans to show updated book titles
+            queryClient.invalidateQueries({ queryKey: ['loans'] });
             toast.success('Book updated successfully!');
         },
         onError: (error: Error) => {
@@ -73,10 +73,10 @@ export const useDeleteBook = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: string) => booksApi.deleteBook(id),
+        mutationFn: (book_id: string) => booksApi.deleteBook(book_id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['books'] });
-            queryClient.invalidateQueries({ queryKey: ['loans'] }); // Refresh loans in case deleted book had active loans
+            queryClient.invalidateQueries({ queryKey: ['loans'] });
             toast.success('Book deleted successfully!');
         },
         onError: (error: Error) => {

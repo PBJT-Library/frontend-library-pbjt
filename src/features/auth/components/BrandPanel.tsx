@@ -1,5 +1,6 @@
 import React from 'react';
-import { BookOpenIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, AcademicCapIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { Logo } from '@/components/ui';
 
 interface BrandPanelProps {
     mousePosition: { x: number; y: number };
@@ -8,7 +9,7 @@ interface BrandPanelProps {
 export const BrandPanel: React.FC<BrandPanelProps> = ({ mousePosition }) => {
     return (
         <div
-            className="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 flex flex-col justify-center overflow-hidden h-full"
+            className="bg-gradient-to-br from-blue-700 via-blue-600 to-slate-800 flex flex-col justify-center items-center overflow-hidden h-full relative"
             style={{
                 transform: `translate(${mousePosition.x * 5}px, ${mousePosition.y * 5}px)`,
                 transition: 'transform 0.4s ease-out'
@@ -31,37 +32,57 @@ export const BrandPanel: React.FC<BrandPanelProps> = ({ mousePosition }) => {
                 </svg>
             </div>
 
-            {/* Content - Centered with Padding */}
-            <div className="relative z-10 text-white px-12 py-12">
-                {/* Logo */}
-                <div className="mb-8">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
-                        <BookOpenIcon className="w-10 h-10 text-white" />
+            {/* Content - Centered with Institutional Hierarchy */}
+            <div className="relative z-10 text-white px-12 py-12 text-center">
+
+                {/* Institutional Logo - PRIMARY */}
+                <div className="mb-8 flex justify-center">
+                    <div className="inline-flex items-center justify-center w-32 h-32 rounded-3xl bg-white/10 backdrop-blur-sm border-2 border-white/20 shadow-2xl p-4">
+                        <Logo
+                            type="institutional"
+                            size="2xl"
+                            className="drop-shadow-2xl"
+                        />
                     </div>
                 </div>
 
-                {/* Main Title */}
-                <h1 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-                    Perpustakaan<br />Digital
+                {/* Institution Name */}
+                <h1 className="text-3xl lg:text-4xl font-bold mb-2 leading-tight">
+                    Politeknik Baja Tegal
                 </h1>
 
                 {/* Subtitle */}
-                <p className="text-blue-100 text-lg mb-8 leading-relaxed">
-                    Sistem Informasi Manajemen<br />Perpustakaan
+                <p className="text-xl lg:text-2xl text-blue-100 mb-8 leading-relaxed font-light">
+                    Sistem Perpustakaan Digital
                 </p>
 
                 {/* Decorative Divider */}
-                <div className="w-20 h-1 bg-white/30 rounded-full mb-8" />
+                <div className="w-24 h-1 bg-blue-400 rounded-full mb-8 mx-auto" />
 
-                {/* Additional Info */}
-                <div className="space-y-3 text-blue-100">
-                    <div className="flex items-center gap-3">
-                        <AcademicCapIcon className="w-5 h-5" />
-                        <span className="text-sm">Akses Koleksi Digital</span>
+                {/* App Logo - SECONDARY */}
+                <div className="mb-8 flex justify-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+                        <Logo
+                            type="library"
+                            size="lg"
+                            className="opacity-80"
+                        />
                     </div>
-                    <div className="flex items-center gap-3">
+                </div>
+
+                {/* Features List */}
+                <div className="space-y-3 text-blue-100">
+                    <div className="flex items-center justify-center gap-3">
                         <BookOpenIcon className="w-5 h-5" />
-                        <span className="text-sm">Manajemen Peminjaman</span>
+                        <span className="text-sm">Koleksi Digital Terintegrasi</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-3">
+                        <UserGroupIcon className="w-5 h-5" />
+                        <span className="text-sm">Manajemen Anggota</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-3">
+                        <AcademicCapIcon className="w-5 h-5" />
+                        <span className="text-sm">Akses Mudah & Cepat</span>
                     </div>
                 </div>
             </div>

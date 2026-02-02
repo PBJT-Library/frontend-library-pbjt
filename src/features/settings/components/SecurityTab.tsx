@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LockClosedIcon, EyeIcon, EyeSlashIcon, ShieldCheckIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { Card, Input, Button } from '@/components/ui';
+import { Card, Button } from '@/components/ui';
 import { passwordSchema, type PasswordFormData } from '../schemas/passwordSchema';
 import { useChangePassword } from '../hooks/usePassword';
 
@@ -112,47 +112,85 @@ export const SecurityTab: React.FC = () => {
                         {/* Password Fields */}
                         <div className="space-y-4">
                             {/* Current Password */}
-                            <div className="relative">
-                                <Input
-                                    label="Current Password"
-                                    type={showCurrentPassword ? 'text' : 'password'}
-                                    {...register('currentPassword')}
-                                    error={errors.currentPassword?.message}
-                                    placeholder="Enter your current password"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                                    className="absolute right-3 top-[38px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                                >
-                                    {showCurrentPassword ? (
-                                        <EyeSlashIcon className="w-5 h-5" />
-                                    ) : (
-                                        <EyeIcon className="w-5 h-5" />
-                                    )}
-                                </button>
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">
+                                    Current Password
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={showCurrentPassword ? 'text' : 'password'}
+                                        {...register('currentPassword')}
+                                        className={
+                                            `w-full px-4 py-2.5 pr-12 rounded-xl border-2 transition-all duration-200 ` +
+                                            `text-slate-900 dark:text-slate-100 ` +
+                                            `bg-white dark:bg-slate-800 ` +
+                                            `placeholder:text-slate-500 dark:placeholder:text-slate-500 ` +
+                                            `font-thin tracking-wider ` +
+                                            `focus:outline-none focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-slate-900 ` +
+                                            `[&::-ms-reveal]:hidden [&::-ms-clear]:hidden ` +
+                                            (errors.currentPassword
+                                                ? 'border-error focus:border-error focus:ring-error/20'
+                                                : 'border-slate-200 dark:border-slate-600 focus:border-primary-500 dark:focus:border-blue-400 focus:ring-primary-500/20')
+                                        }
+                                        placeholder="Enter your current password"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                        tabIndex={-1}
+                                    >
+                                        {showCurrentPassword ? (
+                                            <EyeSlashIcon className="w-5 h-5 stroke-[1]" />
+                                        ) : (
+                                            <EyeIcon className="w-5 h-5 stroke-[1]" />
+                                        )}
+                                    </button>
+                                </div>
+                                {errors.currentPassword && (
+                                    <p className="text-sm text-error mt-1.5">{errors.currentPassword.message}</p>
+                                )}
                             </div>
 
                             {/* New Password */}
-                            <div className="relative">
-                                <Input
-                                    label="New Password"
-                                    type={showNewPassword ? 'text' : 'password'}
-                                    {...register('newPassword')}
-                                    error={errors.newPassword?.message}
-                                    placeholder="Enter your new password"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowNewPassword(!showNewPassword)}
-                                    className="absolute right-3 top-[38px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                                >
-                                    {showNewPassword ? (
-                                        <EyeSlashIcon className="w-5 h-5" />
-                                    ) : (
-                                        <EyeIcon className="w-5 h-5" />
-                                    )}
-                                </button>
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">
+                                    New Password
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={showNewPassword ? 'text' : 'password'}
+                                        {...register('newPassword')}
+                                        className={
+                                            `w-full px-4 py-2.5 pr-12 rounded-xl border-2 transition-all duration-200 ` +
+                                            `text-slate-900 dark:text-slate-100 ` +
+                                            `bg-white dark:bg-slate-800 ` +
+                                            `placeholder:text-slate-500 dark:placeholder:text-slate-500 ` +
+                                            `font-thin tracking-wider ` +
+                                            `focus:outline-none focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-slate-900 ` +
+                                            `[&::-ms-reveal]:hidden [&::-ms-clear]:hidden ` +
+                                            (errors.newPassword
+                                                ? 'border-error focus:border-error focus:ring-error/20'
+                                                : 'border-slate-200 dark:border-slate-600 focus:border-primary-500 dark:focus:border-blue-400 focus:ring-primary-500/20')
+                                        }
+                                        placeholder="Enter your new password"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                        tabIndex={-1}
+                                    >
+                                        {showNewPassword ? (
+                                            <EyeSlashIcon className="w-5 h-5 stroke-[1]" />
+                                        ) : (
+                                            <EyeIcon className="w-5 h-5 stroke-[1]" />
+                                        )}
+                                    </button>
+                                </div>
+                                {errors.newPassword && (
+                                    <p className="text-sm text-error mt-1.5">{errors.newPassword.message}</p>
+                                )}
                             </div>
 
                             {/* Password Strength Indicator */}
@@ -161,8 +199,8 @@ export const SecurityTab: React.FC = () => {
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-slate-600 dark:text-slate-400">Password Strength:</span>
                                         <span className={`font-medium ${passwordStrength.strength === 1 ? 'text-red-600 dark:text-red-400' :
-                                                passwordStrength.strength === 2 ? 'text-yellow-600 dark:text-yellow-400' :
-                                                    'text-green-600 dark:text-green-400'
+                                            passwordStrength.strength === 2 ? 'text-yellow-600 dark:text-yellow-400' :
+                                                'text-green-600 dark:text-green-400'
                                             }`}>
                                             {passwordStrength.label}
                                         </span>
@@ -172,8 +210,8 @@ export const SecurityTab: React.FC = () => {
                                             <div
                                                 key={level}
                                                 className={`h-2 flex-1 rounded-full ${level <= passwordStrength.strength
-                                                        ? passwordStrength.color
-                                                        : 'bg-slate-200 dark:bg-slate-700'
+                                                    ? passwordStrength.color
+                                                    : 'bg-slate-200 dark:bg-slate-700'
                                                     }`}
                                             />
                                         ))}
@@ -182,25 +220,44 @@ export const SecurityTab: React.FC = () => {
                             )}
 
                             {/* Confirm Password */}
-                            <div className="relative">
-                                <Input
-                                    label="Confirm New Password"
-                                    type={showConfirmPassword ? 'text' : 'password'}
-                                    {...register('confirmPassword')}
-                                    error={errors.confirmPassword?.message}
-                                    placeholder="Confirm your new password"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-3 top-[38px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                                >
-                                    {showConfirmPassword ? (
-                                        <EyeSlashIcon className="w-5 h-5" />
-                                    ) : (
-                                        <EyeIcon className="w-5 h-5" />
-                                    )}
-                                </button>
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">
+                                    Confirm New Password
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        {...register('confirmPassword')}
+                                        className={
+                                            `w-full px-4 py-2.5 pr-12 rounded-xl border-2 transition-all duration-200 ` +
+                                            `text-slate-900 dark:text-slate-100 ` +
+                                            `bg-white dark:bg-slate-800 ` +
+                                            `placeholder:text-slate-500 dark:placeholder:text-slate-500 ` +
+                                            `font-thin tracking-wider ` +
+                                            `focus:outline-none focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-slate-900 ` +
+                                            `[&::-ms-reveal]:hidden [&::-ms-clear]:hidden ` +
+                                            (errors.confirmPassword
+                                                ? 'border-error focus:border-error focus:ring-error/20'
+                                                : 'border-slate-200 dark:border-slate-600 focus:border-primary-500 dark:focus:border-blue-400 focus:ring-primary-500/20')
+                                        }
+                                        placeholder="Confirm your new password"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                        tabIndex={-1}
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeSlashIcon className="w-5 h-5 stroke-[1]" />
+                                        ) : (
+                                            <EyeIcon className="w-5 h-5 stroke-[1]" />
+                                        )}
+                                    </button>
+                                </div>
+                                {errors.confirmPassword && (
+                                    <p className="text-sm text-error mt-1.5">{errors.confirmPassword.message}</p>
+                                )}
                             </div>
                         </div>
 

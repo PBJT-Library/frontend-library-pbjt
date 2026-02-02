@@ -50,7 +50,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({
                 {members.map((member) => (
                     <TableRow key={member.id}>
                         <TableCell>
-                            <div className="font-mono text-sm font-medium text-primary-700 dark:text-blue-300">{member.id}</div>
+                            <div className="font-mono text-sm font-medium text-primary-700 dark:text-blue-300">{member.member_id}</div>
                         </TableCell>
                         <TableCell>
                             <div className="font-medium text-slate-900 dark:text-slate-50">{member.name}</div>

@@ -42,7 +42,7 @@ export const MembersPage: React.FC = () => {
 
     const confirmDelete = async () => {
         if (deletingMember) {
-            await deleteMutation.mutateAsync(deletingMember.id);
+            await deleteMutation.mutateAsync(deletingMember.member_id);
             setDeletingMember(undefined);
         }
     };
@@ -56,7 +56,7 @@ export const MembersPage: React.FC = () => {
     const pagination = data?.pagination;
 
     // Get unique study programs for filter
-    const studyPrograms = Array.from(new Set(members.map((m: Member) => m.study_program)));
+    const studyPrograms = Array.from(new Set(members.map((m: Member) => m.study_program).filter((p): p is string => p !== null)));
 
     return (
         <div className="space-y-6">
@@ -98,7 +98,7 @@ export const MembersPage: React.FC = () => {
                             }}
                         >
                             <option value="">All Programs</option>
-                            {studyPrograms.map((program: string) => (
+                            {studyPrograms.map((program) => (
                                 <option key={program} value={program}>{program}</option>
                             ))}
                         </Select>
